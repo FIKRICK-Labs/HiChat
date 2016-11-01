@@ -1,48 +1,18 @@
-package model;
-
-
-/**
-* @generated
-*/
-public class LeaveGroupCommand implements Command {
-    
-    /**
-    * @generated
-    */
-    private String groupName;
-    
-    /**
-    * @generated
-    */
-    private String username;
+package hichat.commands;public class LeaveGroupCommand implements Command {
+        private String groupName;
+        private String username;
     
     
-    
-    /**
-    * @generated
-    */
-    private String getGroupName() {
+        private String getGroupName() {
         return this.groupName;
     }
-    
-    /**
-    * @generated
-    */
-    private String setGroupName(String groupName) {
+        private String setGroupName(String groupName) {
         this.groupName = groupName;
     }
-    
-    /**
-    * @generated
-    */
-    private String getUsername() {
+        private String getUsername() {
         return this.username;
     }
-    
-    /**
-    * @generated
-    */
-    private String setUsername(String username) {
+        private String setUsername(String username) {
         this.username = username;
     }
     

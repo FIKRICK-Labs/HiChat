@@ -1,46 +1,24 @@
-package model;
+package hichat.controllers;
 
+import hichat.models.Group;
 
-/**
-* @generated
-*/
 public class GroupManager {
-    
-    /**
-    * @generated
-    */
     private Group groups;
     
-    
-    
-    /**
-    * @generated
-    */
     private Group getGroups() {
         return this.groups;
     }
     
-    /**
-    * @generated
-    */
-    private Group setGroups(Group groups) {
+    private void setGroups(Group groups) {
         this.groups = groups;
     }
     
-
-    //                          Operations                                  
-    
-    /**
-    * @generated
-    */
+    // Operations                                  
     public boolean removeMember() {
         //TODO
         return false;
     }
     
-    /**
-    * @generated
-    */
     public boolean addMember() {
         //TODO
         return false;

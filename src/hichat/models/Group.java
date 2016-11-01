@@ -1,87 +1,44 @@
-package model;
+package hichat.models;
 
+import java.util.ArrayList;
 
-/**
-* @generated
-*/
 public class Group {
-    
-    /**
-    * @generated
-    */
     private String groupName;
-    
-    /**
-    * @generated
-    */
     private String admin;
-    
-    /**
-    * @generated
-    */
     private String members;
-    
-    /**
-    * @generated
-    */
-    private Message messages;
+    private ArrayList<Message> messages;
     
     
-    
-    /**
-    * @generated
-    */
-    private String getGroupName() {
+    public String getGroupName() {
         return this.groupName;
     }
     
-    /**
-    * @generated
-    */
-    private String setGroupName(String groupName) {
+    public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
     
-    /**
-    * @generated
-    */
-    private String getAdmin() {
+    public String getAdmin() {
         return this.admin;
     }
     
-    /**
-    * @generated
-    */
-    private String setAdmin(String admin) {
+    public void setAdmin(String admin) {
         this.admin = admin;
     }
     
-    /**
-    * @generated
-    */
-    private String getMembers() {
+    public String getMembers() {
         return this.members;
     }
     
-    /**
-    * @generated
-    */
-    private String setMembers(String members) {
+    public void setMembers(String members) {
         this.members = members;
     }
     
-    /**
-    * @generated
-    */
-    private Message getMessages() {
+    public ArrayList<Message> getMessages() {
         return this.messages;
     }
     
-    /**
-    * @generated
-    */
-    private Message setMessages(Message messages) {
-        this.messages = messages;
+    public void setMessages(Message message) {
+        this.messages.add(message);
     }
     
 }

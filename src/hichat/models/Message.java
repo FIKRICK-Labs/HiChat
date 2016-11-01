@@ -1,67 +1,29 @@
-package model;
+package hichat.models;
 
+import java.util.Date;
 
-/**
-* @generated
-*/
 public class Message {
-    
-    /**
-    * @generated
-    */
     private String sender;
-    
-    /**
-    * @generated
-    */
     private Date sentDate;
-    
-    /**
-    * @generated
-    */
     private String content;
-    
-    
-    
-    /**
-    * @generated
-    */
-    private String getSender() {
+
+
+    public String getSender() {
         return this.sender;
     }
-    
-    /**
-    * @generated
-    */
-    private String setSender(String sender) {
+    public void setSender(String sender) {
         this.sender = sender;
     }
-    
-    /**
-    * @generated
-    */
-    private Date getSentDate() {
+    public Date getSentDate() {
         return this.sentDate;
     }
-    
-    /**
-    * @generated
-    */
-    private Date setSentDate(Date sentDate) {
+    public void setSentDate(Date sentDate) {
         this.sentDate = sentDate;
     }
-    
-    /**
-    * @generated
-    */
-    private String getContent() {
+    public String getContent() {
         return this.content;
     }
-    
-    /**
-    * @generated
-    */
-    private String setContent(String content) {
+    public void setContent(String content) {
         this.content = content;
     }
     

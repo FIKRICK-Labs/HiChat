@@ -1,48 +1,18 @@
-package model;
-
-
-/**
-* @generated
-*/
-public class LoginCommand implements Command {
-    
-    /**
-    * @generated
-    */
-    private String username;
-    
-    /**
-    * @generated
-    */
-    private String password;
+package hichat.commands;public class LoginCommand implements Command {
+        private String username;
+        private String password;
     
     
-    
-    /**
-    * @generated
-    */
-    private String getUsername() {
+        private String getUsername() {
         return this.username;
     }
-    
-    /**
-    * @generated
-    */
-    private String setUsername(String username) {
+        private String setUsername(String username) {
         this.username = username;
     }
-    
-    /**
-    * @generated
-    */
-    private String getPassword() {
+        private String getPassword() {
         return this.password;
     }
-    
-    /**
-    * @generated
-    */
-    private String setPassword(String password) {
+        private String setPassword(String password) {
         this.password = password;
     }
     

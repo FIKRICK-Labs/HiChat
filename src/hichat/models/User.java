@@ -1,163 +1,64 @@
-package model;
+package hichat.models;
 
+import java.util.Map;
 
-/**
-* @generated
-*/
 public class User {
-    
-    /**
-    * @generated
-    */
     private String username;
-    
-    /**
-    * @generated
-    */
     private String name;
-    
-    /**
-    * @generated
-    */
     private String password;
-    
-    /**
-    * @generated
-    */
     private String friends;
-    
-    /**
-    * @generated
-    */
     private String msgQueueName;
-    
-    /**
-    * @generated
-    */
     private String oprQueueName;
-    
-    /**
-    * @generated
-    */
     private String notifQueueName;
+    private Map<String, Message> messages;
     
-    /**
-    * @generated
-    */
-    private Message messages;
-    
-    
-    
-    /**
-    * @generated
-    */
-    private String getUsername() {
+    public String getUsername() {
         return this.username;
     }
-    
-    /**
-    * @generated
-    */
-    private String setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
-    
-    /**
-    * @generated
-    */
-    private String getName() {
+    public String getName() {
         return this.name;
     }
-    
-    /**
-    * @generated
-    */
-    private String setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
-    
-    /**
-    * @generated
-    */
-    private String getPassword() {
+    public String getPassword() {
         return this.password;
     }
-    
-    /**
-    * @generated
-    */
-    private String setPassword(String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
-    
-    /**
-    * @generated
-    */
-    private String getFriends() {
+    public String getFriends() {
         return this.friends;
     }
-    
-    /**
-    * @generated
-    */
-    private String setFriends(String friends) {
+    public void setFriends(String friends) {
         this.friends = friends;
     }
-    
-    /**
-    * @generated
-    */
-    private String getMsgQueueName() {
+    public String getMsgQueueName() {
         return this.msgQueueName;
     }
-    
-    /**
-    * @generated
-    */
-    private String setMsgQueueName(String msgQueueName) {
+    public void setMsgQueueName(String msgQueueName) {
         this.msgQueueName = msgQueueName;
     }
-    
-    /**
-    * @generated
-    */
-    private String getOprQueueName() {
+    public String getOprQueueName() {
         return this.oprQueueName;
     }
-    
-    /**
-    * @generated
-    */
-    private String setOprQueueName(String oprQueueName) {
+    public void setOprQueueName(String oprQueueName) {
         this.oprQueueName = oprQueueName;
     }
-    
-    /**
-    * @generated
-    */
-    private String getNotifQueueName() {
+    public String getNotifQueueName() {
         return this.notifQueueName;
     }
-    
-    /**
-    * @generated
-    */
-    private String setNotifQueueName(String notifQueueName) {
+    public void setNotifQueueName(String notifQueueName) {
         this.notifQueueName = notifQueueName;
     }
-    
-    /**
-    * @generated
-    */
-    private Message getMessages() {
-        return this.messages;
+    public Message getMessages(String username) {
+        return this.messages.get(username);
     }
-    
-    /**
-    * @generated
-    */
-    private Message setMessages(Message messages) {
-        this.messages = messages;
+    public void setMessages(Message message) {
+        this.messages.put(message.getSender(), message);
     }
     
 }

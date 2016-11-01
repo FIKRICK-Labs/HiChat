@@ -1,27 +1,11 @@
-package model;
-
-
-/**
-* @generated
-*/
-public class NotificationManager {
+package hichat.controllers;public class NotificationManager {
     
     
-    
-
-    //                          Operations                                  
-    
-    /**
-    * @generated
-    */
-    public void sendNotification() {
+        //                          Operations                                  
+        public void sendNotification() {
         //TODO
     }
-    
-    /**
-    * @generated
-    */
-    public void sendGroupNotification() {
+        public void sendGroupNotification() {
         //TODO
     }
     

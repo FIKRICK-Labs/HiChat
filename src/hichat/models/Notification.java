@@ -1,57 +1,26 @@
-package model;
+package hichat.models;
 
-
-/**
-* @generated
-*/
 public class Notification {
-    
-    /**
-    * @generated
-    */
     private NotificationEnumeration type;
-    
-    /**
-    * @generated
-    */
     private String content;
-    
-    
-    
-    /**
-    * @generated
-    */
-    private NotificationEnumeration getType() {
+
+
+    public NotificationEnumeration getType() {
         return this.type;
     }
     
-    /**
-    * @generated
-    */
-    private NotificationEnumeration setType(NotificationEnumeration type) {
+    public void setType(NotificationEnumeration type) {
         this.type = type;
     }
     
-    /**
-    * @generated
-    */
-    private String getContent() {
+    public String getContent() {
         return this.content;
     }
     
-    /**
-    * @generated
-    */
-    private String setContent(String content) {
+    public void setContent(String content) {
         this.content = content;
     }
-    
-
-    //                          Operations                                  
-    
-    /**
-    * @generated
-    */
+        //                          Operations                                  
     public void display() {
         //TODO
     }

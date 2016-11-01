@@ -1,46 +1,23 @@
-package model;
+package hichat.controllers;
 
+import hichat.models.User;
 
-/**
-* @generated
-*/
 public class UserManager {
-    
-    /**
-    * @generated
-    */
     private User users;
     
     
-    
-    /**
-    * @generated
-    */
     private User getUsers() {
         return this.users;
     }
-    
-    /**
-    * @generated
-    */
-    private User setUsers(User users) {
+    private void setUsers(User users) {
         this.users = users;
     }
     
-
-    //                          Operations                                  
-    
-    /**
-    * @generated
-    */
+    // Operations                                  
     public boolean createFriendRelation() {
         //TODO
         return false;
     }
-    
-    /**
-    * @generated
-    */
     public boolean authenticateUser() {
         //TODO
         return false;

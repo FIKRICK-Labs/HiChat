@@ -1,117 +1,54 @@
-package model;
+package hichat.server;
 
+import hichat.controllers.GroupManager;
+import hichat.controllers.UserManager;
 
-/**
-* @generated
-*/
 public class HiChatServer {
-    
-    /**
-    * @generated
-    */
     private GroupManager groupManager;
-    
-    /**
-    * @generated
-    */
     private UserManager userManager;
-    
-    /**
-    * @generated
-    */
     private String RPCExchange;
-    
-    /**
-    * @generated
-    */
     private String messageExchange;
-    
-    /**
-    * @generated
-    */
     private String notificationExchange;
     
     
-    
-    /**
-    * @generated
-    */
-    private GroupManager getGroupManager() {
+    public GroupManager getGroupManager() {
         return this.groupManager;
     }
-    
-    /**
-    * @generated
-    */
-    private GroupManager setGroupManager(GroupManager groupManager) {
+    public void setGroupManager(GroupManager groupManager) {
         this.groupManager = groupManager;
     }
-    
-    /**
-    * @generated
-    */
-    private UserManager getUserManager() {
+    public UserManager getUserManager() {
         return this.userManager;
     }
-    
-    /**
-    * @generated
-    */
-    private UserManager setUserManager(UserManager userManager) {
+    public void setUserManager(UserManager userManager) {
         this.userManager = userManager;
     }
-    
-    /**
-    * @generated
-    */
-    private String getRPCExchange() {
+    public String getRPCExchange() {
         return this.RPCExchange;
     }
-    
-    /**
-    * @generated
-    */
-    private String setRPCExchange(String RPCExchange) {
+    public void setRPCExchange(String RPCExchange) {
         this.RPCExchange = RPCExchange;
     }
-    
-    /**
-    * @generated
-    */
-    private String getMessageExchange() {
+    public String getMessageExchange() {
         return this.messageExchange;
     }
-    
-    /**
-    * @generated
-    */
-    private String setMessageExchange(String messageExchange) {
+    public void setMessageExchange(String messageExchange) {
         this.messageExchange = messageExchange;
     }
-    
-    /**
-    * @generated
-    */
-    private String getNotificationExchange() {
+    public String getNotificationExchange() {
         return this.notificationExchange;
     }
-    
-    /**
-    * @generated
-    */
-    private String setNotificationExchange(String notificationExchange) {
+    public void setNotificationExchange(String notificationExchange) {
         this.notificationExchange = notificationExchange;
     }
     
-
-    //                          Operations                                  
-    
-    /**
-    * @generated
-    */
+    //Operations                                  
     public void start() {
         //TODO
     }
     
+    public static void main(String[] args) {
+        
+    }
     
 }

@@ -3,15 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package hichat.helpers;
-
-import java.io.ByteArrayInputStream;
+package hichat.helpers;import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-/**
+import java.io.ObjectOutputStream;/**
  *
  * @author mfikria
  */
