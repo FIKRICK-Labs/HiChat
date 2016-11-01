@@ -1,11 +1,11 @@
 package hichat.controllers;public class NotificationManager {
     
     
-        //                          Operations                                  
-        public void sendNotification() {
+    //Operations                                  
+    public void sendNotification() {
         //TODO
     }
-        public void sendGroupNotification() {
+    public void sendGroupNotification() {
         //TODO
     }
     

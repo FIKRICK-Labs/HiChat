@@ -1,16 +1,17 @@
 package hichat.controllers;
 
 import hichat.models.User;
+import java.util.Map;
 
 public class UserManager {
-    private User users;
+    private Map<String, User> users;
     
     
-    private User getUsers() {
-        return this.users;
+    private User getUsers(String username) {
+        return this.users.get(username);
     }
-    private void setUsers(User users) {
-        this.users = users;
+    private void setUsers(User user) {
+        this.users.put(user.getUsername(), user);
     }
     
     // Operations                                  

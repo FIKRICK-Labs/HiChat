@@ -1,4 +1,8 @@
-package hichat.commands;public class RegisterCommand implements Command {
+package hichat.commands;
+
+import hichat.models.CommandEnumeration;
+
+public class RegisterCommand implements Command {
         private String username;
         private String password;
         private String name;
@@ -7,20 +11,25 @@ package hichat.commands;public class RegisterCommand implements Command {
         private String getUsername() {
         return this.username;
     }
-        private String setUsername(String username) {
+        private void setUsername(String username) {
         this.username = username;
     }
         private String getPassword() {
         return this.password;
     }
-        private String setPassword(String password) {
+        private void setPassword(String password) {
         this.password = password;
     }
         private String getName() {
         return this.name;
     }
-        private String setName(String name) {
+        private void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public CommandEnumeration getType() {
+        return CommandEnumeration.REGISTER;
     }
     
 }

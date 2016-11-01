@@ -3,11 +3,13 @@ package hichat.client;
 import hichat.models.Notification;
 import hichat.models.User;
 import hichat.models.Group;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class HiChatClient {
     private User user;
-    private Group groups;
-    private Notification notifications;
+    private Map<String, Group> groups;
+    private ArrayList<Notification> notifications;
     private String messageExchange;
     private String RPCExchange;
     private String notificationExchange;
@@ -19,17 +21,11 @@ public class HiChatClient {
     public void setUser(User user) {
         this.user = user;
     }
-    public Group getGroups() {
-        return this.groups;
+    public Group getGroups(String groupName) {
+        return this.groups.get(groupName);
     }
-    public void setGroups(Group groups) {
-        this.groups = groups;
-    }
-    public Notification getNotifications() {
-        return this.notifications;
-    }
-    public void setNotifications(Notification notifications) {
-        this.notifications = notifications;
+    public void setGroups(Group group) {
+        this.groups.put(group.getGroupName(), group);
     }
     public String getMessageExchange() {
         return this.messageExchange;
