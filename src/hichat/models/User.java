@@ -1,5 +1,6 @@
 package hichat.models;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class User {
@@ -10,7 +11,7 @@ public class User {
     private String msgQueueName;
     private String oprQueueName;
     private String notifQueueName;
-    private Map<String, Message> messages;
+    private Map<String, ArrayList<Message>> messages;
     
     public String getUsername() {
         return this.username;
@@ -54,11 +55,11 @@ public class User {
     public void setNotifQueueName(String notifQueueName) {
         this.notifQueueName = notifQueueName;
     }
-    public Message getMessages(String username) {
+    public ArrayList<Message> getMessages(String username) {
         return this.messages.get(username);
     }
-    public void setMessages(Message message) {
-        this.messages.put(message.getSender(), message);
+    public void setMessages(String username, ArrayList<Message> message) {
+        this.messages.put(username, message);
     }
     
 }
