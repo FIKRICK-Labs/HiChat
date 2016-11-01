@@ -1,8 +1,10 @@
 package hichat.client;
 
+import hichat.commands.*;
 import hichat.models.Notification;
 import hichat.models.User;
 import hichat.models.Group;
+import hichat.models.Message;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -21,11 +23,14 @@ public class HiChatClient {
     public void setUser(User user) {
         this.user = user;
     }
-    public Group getGroups(String groupName) {
+    public Group getGroup(String groupName) {
         return this.groups.get(groupName);
     }
-    public void setGroups(Group group) {
+    public void addGroup(Group group) {
         this.groups.put(group.getGroupName(), group);
+    }
+    public void removeGroup(String groupName) {
+        this.groups.remove(groupName);
     }
     public String getMessageExchange() {
         return this.messageExchange;
@@ -50,38 +55,32 @@ public class HiChatClient {
     public void start() {
         //TODO
     }
-    public void chat() {
+    public void chat(Message message, String receiver) {
         //TODO
     }
-    public void chatGroup() {
+    public void chatGroup(Message message, String groupName) {
         //TODO
     }
     public void execute() {
         //TODO
     }
-    public boolean login() {
+    public void login(LoginCommand command) {
         //TODO
-        return false;
     }
-    public boolean register() {
+    public void register(RegisterCommand command) {
         //TODO
-        return false;
     }
-    public String createGroup() {
+    public void createGroup(CreateGroupCommand command) {
         //TODO
-        return "";
     }
-    public boolean leaveGroup() {
+    public void leaveGroup(LeaveGroupCommand command) {
         //TODO
-        return false;
     }
-    public boolean addFriend() {
+    public void addFriend(AddFriendCommand command) {
         //TODO
-        return false;
     }
-    public boolean addGroupMember() {
+    public void addGroupMember(AddGroupMemberCommand command) {
         //TODO
-        return false;
     }
     
     public static void main(String[] args) {
