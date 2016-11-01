@@ -7,10 +7,10 @@ public class UserManager {
     private Map<String, User> users;
     
     
-    private User getUsers(String username) {
+    public User getUsers(String username) {
         return this.users.get(username);
     }
-    private void setUsers(User user) {
+    public void setUsers(User user) {
         this.users.put(user.getUsername(), user);
     }
     
