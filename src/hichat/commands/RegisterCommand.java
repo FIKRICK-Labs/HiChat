@@ -2,34 +2,31 @@ package hichat.commands;
 
 import hichat.models.CommandEnumeration;
 
-public class RegisterCommand implements Command {
-        private String username;
-        private String password;
-        private String name;
+public class RegisterCommand extends Command {
+    private String username;
+    private String password;
+    private String name;
     
+    public RegisterCommand() {
+        type = CommandEnumeration.REGISTER.value();
+    }
     
-        private String getUsername() {
+    public String getUsername() {
         return this.username;
     }
-        private void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
-        private String getPassword() {
+    public String getPassword() {
         return this.password;
     }
-        private void setPassword(String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
-        private String getName() {
+    public String getName() {
         return this.name;
     }
-        private void setName(String name) {
+    public void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public CommandEnumeration getType() {
-        return CommandEnumeration.REGISTER;
-    }
-    
+    }    
 }

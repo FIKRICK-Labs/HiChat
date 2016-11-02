@@ -8,9 +8,6 @@ public class User {
     private String name;
     private String password;
     private String friends;
-    private String msgQueueName;
-    private String oprQueueName;
-    private String notifQueueName;
     private Map<String, ArrayList<Message>> messages;
     
     public String getUsername() {
@@ -36,24 +33,6 @@ public class User {
     }
     public void setFriends(String friends) {
         this.friends = friends;
-    }
-    public String getMsgQueueName() {
-        return this.msgQueueName;
-    }
-    public void setMsgQueueName(String msgQueueName) {
-        this.msgQueueName = msgQueueName;
-    }
-    public String getOprQueueName() {
-        return this.oprQueueName;
-    }
-    public void setOprQueueName(String oprQueueName) {
-        this.oprQueueName = oprQueueName;
-    }
-    public String getNotifQueueName() {
-        return this.notifQueueName;
-    }
-    public void setNotifQueueName(String notifQueueName) {
-        this.notifQueueName = notifQueueName;
     }
     public ArrayList<Message> getMessages(String username) {
         return this.messages.get(username);
