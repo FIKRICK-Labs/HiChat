@@ -28,7 +28,7 @@ public class MessageReceiverRunnable implements Runnable {
     private final String MESSAGE_EXCHANGE_NAME;
     private final String RABBITMQ_HOST;
     
-    private String privateMessageBindingKey;
+    private String privateMessageRoutingKey;
     
     private final ConnectionFactory factory;
     private final Connection connection;
@@ -40,7 +40,7 @@ public class MessageReceiverRunnable implements Runnable {
         this.MESSAGE_EXCHANGE_NAME = MESSAGE_EXCHANGE_NAME;
         this.RABBITMQ_HOST = MESSAGE_EXCHANGE_NAME;
         
-        this.privateMessageBindingKey = "#." + username;
+        this.privateMessageRoutingKey = "#." + username;
         
         factory = new ConnectionFactory();
         factory.setHost(this.RABBITMQ_HOST);
@@ -60,7 +60,7 @@ public class MessageReceiverRunnable implements Runnable {
         System.out.println("Message receiver is running...");
         
         try {
-            addNewBinding(privateMessageBindingKey);
+            addNewBinding(privateMessageRoutingKey);
         } catch (IOException ex) {
             Logger.getLogger(hichat.server.tasks.MessageReceiverRunnable.class.getName()).log(Level.SEVERE, null, ex);
         }
