@@ -1,14 +1,24 @@
 package hichat.models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class User {
     private String username;
     private String name;
     private String password;
-    private String friends;
+    private ArrayList<String> friends;
     private Map<String, ArrayList<Message>> messages;
+    
+    public User(String username, String name, String password) {
+        this.username = username;
+        this.name = name;
+        this.password = password;
+        this.friends = new ArrayList<>();
+        this.messages = new HashMap<>();
+    }
     
     public String getUsername() {
         return this.username;
@@ -28,10 +38,10 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    public String getFriends() {
+    public List<String> getFriends() {
         return this.friends;
     }
-    public void setFriends(String friends) {
+    public void setFriends(ArrayList<String> friends) {
         this.friends = friends;
     }
     public ArrayList<Message> getMessages(String username) {
@@ -41,4 +51,11 @@ public class User {
         this.messages.put(username, message);
     }
     
+    public void initFriends() {
+        this.friends = new ArrayList<>();
+    }
+    
+    public void initMessages() {
+        this.messages = new HashMap<>();
+    }
 }
