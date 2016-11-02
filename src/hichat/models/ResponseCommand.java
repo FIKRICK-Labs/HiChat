@@ -6,6 +6,7 @@
 package hichat.models;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,6 +17,9 @@ public class ResponseCommand implements Serializable {
     String status;
     Map<String, Object> objectMap;
     
+    public ResponseCommand() {
+        this.objectMap = new HashMap<>();
+    }
     public ResponseCommand(String status) {
         this.status = status;
         this.objectMap = null;

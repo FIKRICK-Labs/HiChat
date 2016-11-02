@@ -1,15 +1,17 @@
 package hichat.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class User {
+public class User implements Serializable {
     private String username;
     private String name;
     private String password;
     private ArrayList<String> friends;
+    private ArrayList<String> groups;
     private Map<String, ArrayList<Message>> messages;
     
     public User(String username, String name, String password) {
@@ -17,6 +19,7 @@ public class User {
         this.name = name;
         this.password = password;
         this.friends = new ArrayList<>();
+        this.groups = new ArrayList<>();
         this.messages = new HashMap<>();
     }
     
@@ -44,6 +47,17 @@ public class User {
     
     public ArrayList<String> getFriends() {
         return this.friends;
+    }
+    
+    public ArrayList<String> getGroups() {
+        return this.groups;
+    }
+    public void addGroup(String newGroupName) {
+        this.groups.add(newGroupName);
+    }
+    
+    public void removeGroup(String groupName) {
+        this.groups.remove(groupName);
     }
     public ArrayList<Message> getMessages(String username) {
         return this.messages.get(username);

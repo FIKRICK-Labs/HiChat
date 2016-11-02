@@ -1,5 +1,6 @@
 package hichat.controllers;
 
+import hichat.commands.LoginCommand;
 import hichat.models.User;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +29,12 @@ public class UserManager {
         this.users.get(usernameTwo).getFriends().add(usernameOne);
         return true;
     }
-    public boolean authenticateUser() {
-        //TODO
+    public boolean authenticateUser(LoginCommand loginCommand) {
+        if (users.containsKey(loginCommand.getUsername())) {
+            if (users.get(loginCommand.getUsername()).getPassword().equals(loginCommand.getPassword())) {
+                return true;
+            }
+        }
         return false;
     }
     

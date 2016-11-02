@@ -14,6 +14,7 @@ import hichat.models.Message;
 import hichat.models.ResponseCommand;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -112,7 +113,7 @@ public class HiChatClient {
         //TODO
     }
     
-    public void login(LoginCommand command) throws IOException, InterruptedException {
+    public void login(LoginCommand command) throws IOException, InterruptedException, ClassNotFoundException {
         String corrId = UUID.randomUUID().toString();
 
         BasicProperties props = new BasicProperties
@@ -123,17 +124,23 @@ public class HiChatClient {
         
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
         
-        String response;
         
         while (true) {
+            ResponseCommand responseCommand;
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
-                response = new String(delivery.getBody(), "UTF-8");
+                responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
+                System.out.println("REGISTER COMMAND RESPONSE: " +responseCommand.getStatus());
+                HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
+                if (objectMap.containsKey("user")) {
+                    this.user = (User) objectMap.get("user");
+                }
+                printFriendList();
+                printGroupList();
                 break;
             }
         }
         
-        System.out.println(response);
     }
     public void register(RegisterCommand command) throws IOException, InterruptedException, ClassNotFoundException {
         String corrId = UUID.randomUUID().toString();
@@ -200,6 +207,22 @@ public class HiChatClient {
                                     .build();
         
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
+    }
+    
+    public void printFriendList() {
+        System.out.println("Friend List");
+        System.out.println("===========");
+        for(String friend : user.getFriends()) {
+            System.out.println(friend);
+        }
+    }
+    
+    public void printGroupList() {
+        System.out.println("Group List");
+        System.out.println("==========");
+        for(String group : user.getGroups()) {
+            System.out.println(group);
+        }
     }
     
     public static void main(String[] args) throws IOException, TimeoutException, ClassNotFoundException {

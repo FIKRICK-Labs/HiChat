@@ -13,6 +13,7 @@ import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 import hichat.commands.Command;
+import hichat.commands.LoginCommand;
 import hichat.commands.RegisterCommand;
 import hichat.controllers.GroupManager;
 import hichat.controllers.UserManager;
@@ -23,6 +24,8 @@ import hichat.models.User;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -85,6 +88,8 @@ public class RPCServerRunnable implements Runnable {
 //                    String message = new String(delivery.getBody(),"UTF-8");
                     Command command = (Command) Helper.deserialize(delivery.getBody());
     //                int n = Integer.parseInt(message);
+                    String status;
+                    Map<String, Object> objectMap = new HashMap<>();
                     switch (command.getType()) {
                         case "ADDFRIEND":
                             response = "Add Friend";
@@ -93,11 +98,19 @@ public class RPCServerRunnable implements Runnable {
                             response = "Leave Group";
                             break;
                         case "LOGIN":
-                            response = "Login";
+                            LoginCommand loginCommand = (LoginCommand) command;
+                            if (userManager.authenticateUser(loginCommand)) {
+                                responseCommand = new ResponseCommand();
+                                responseCommand.setStatus("SUCCESS.");
+                                responseCommand.addObjectMap("user", userManager.getUser(loginCommand.getUsername()));
+                            }
+                            else {
+                                responseCommand = new ResponseCommand("FAILED.");
+                            }
+                            
                             break;
                         case "REGISTER":
                             RegisterCommand registerCommand = (RegisterCommand) command;
-                            String status;
                             if (userManager.getUsers().containsKey(registerCommand.getUsername())) {
                                 status = "FAILED. Username exists.";
                             }
