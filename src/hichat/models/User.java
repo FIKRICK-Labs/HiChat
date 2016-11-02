@@ -41,6 +41,10 @@ public class User {
     public void addFriends(String friend) {
         this.friends.add(friend);
     }
+    
+    public ArrayList<String> getFriends() {
+        return this.friends;
+    }
     public ArrayList<Message> getMessages(String username) {
         return this.messages.get(username);
     }

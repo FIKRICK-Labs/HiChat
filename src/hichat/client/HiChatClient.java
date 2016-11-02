@@ -11,8 +11,10 @@ import hichat.models.Notification;
 import hichat.models.User;
 import hichat.models.Group;
 import hichat.models.Message;
+import hichat.models.ResponseCommand;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
@@ -28,10 +30,10 @@ public class HiChatClient {
     private Helper helper;
     
     private final String MESSAGE_EXCHANGE_NAME = "message_exchange";
-    private final String RPC_EXCHANGE_NAME = "rpc_exchange";
+    private final String RPC_EXCHANGE_NAME = "";
     private final String NOTIFICATION_EXCHANGE_NAME = "notification_exchange";
     
-    private final String RPC_QUEUE_NAME = "";
+    private final String RPC_QUEUE_NAME = "rpc_queue";
     private String oprQueueName;
     private String msgQueueName;
     private String notifQueueName;
@@ -40,8 +42,7 @@ public class HiChatClient {
     private Channel channel;
     private QueueingConsumer consumer;
 
-    private static Queue<String> listOfActions;
-    private static Scanner reader = new Scanner(System.in);
+    private static Queue<String> listOfActions = new LinkedList<>();
 
     public User getUser() {
         return this.user;
@@ -134,7 +135,7 @@ public class HiChatClient {
         
         System.out.println(response);
     }
-    public void register(RegisterCommand command) throws IOException {
+    public void register(RegisterCommand command) throws IOException, InterruptedException, ClassNotFoundException {
         String corrId = UUID.randomUUID().toString();
 
         BasicProperties props = new BasicProperties
@@ -145,6 +146,15 @@ public class HiChatClient {
         
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
         
+        while (true) {
+            ResponseCommand responseCommand;
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
+                System.out.println("REGISTER COMMAND RESPONSE: " +responseCommand.getStatus());
+                break;
+            }
+        }
     }
     public void createGroup(CreateGroupCommand command) throws IOException {
         String corrId = UUID.randomUUID().toString();
@@ -192,14 +202,14 @@ public class HiChatClient {
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
     }
     
-    public static void main(String[] args) throws IOException, TimeoutException {
+    public static void main(String[] args) throws IOException, TimeoutException, ClassNotFoundException {
         HiChatClient client =  new HiChatClient();
         
         try {
             mainloop:
             do {
                 System.out.print(">> ");
-                reader = new Scanner(System.in);
+                Scanner reader = new Scanner(System.in);
                 listOfActions.add(reader.nextLine());
 
                 String[] splitStr = listOfActions.remove().split("\\s+");
