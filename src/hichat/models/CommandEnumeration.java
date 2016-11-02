@@ -10,12 +10,12 @@ package hichat.models;
  * @author Erick Chandra
  */
 public enum CommandEnumeration {
-    ADD_FRIEND,
-    LEAVE_GROUP,
+    ADDFRIEND,
+    LEAVEGROUP,
     LOGIN,
     REGISTER,
-    CREATE_GROUP,
-    ADD_GROUP_MEMBER;
+    CREATEGROUP,
+    ADDGROUPMEMBER;
     
     public String value() {
         return name();

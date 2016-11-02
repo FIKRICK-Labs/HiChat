@@ -5,12 +5,14 @@
  */
 package hichat.commands;
 
-import hichat.models.CommandEnumeration;
 
 /**
  *
  * @author mfikria
  */
-public interface Command {
-    public CommandEnumeration getType();   
+public class Command {
+    protected String type;
+    public String getType(){
+        return this.type;
+    }   
 }

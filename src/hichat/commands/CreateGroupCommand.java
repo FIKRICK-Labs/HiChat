@@ -2,34 +2,31 @@ package hichat.commands;
 
 import hichat.models.CommandEnumeration;
 
-public class CreateGroupCommand implements Command {
-        private String groupName;
-        private String usernameAdmin;
-        private String username;
+public class CreateGroupCommand extends Command {
+    private String groupName;
+    private String usernameAdmin;
+    private String username;
     
+    public CreateGroupCommand() {
+        type = CommandEnumeration.CREATEGROUP.value();
+    }     
     
-        private String getGroupName() {
+    public String getGroupName() {
         return this.groupName;
     }
-        private void setGroupName(String groupName) {
+    public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
-        private String getUsernameAdmin() {
+    public String getUsernameAdmin() {
         return this.usernameAdmin;
     }
-        private void setUsernameAdmin(String usernameAdmin) {
+    public void setUsernameAdmin(String usernameAdmin) {
         this.usernameAdmin = usernameAdmin;
     }
-        private String getUsername() {
+    public String getUsername() {
         return this.username;
     }
-        private void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
-    }
-
-    @Override
-    public CommandEnumeration getType() {
-        return CommandEnumeration.CREATE_GROUP;
-    }
-    
+    }    
 }
