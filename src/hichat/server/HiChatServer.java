@@ -11,7 +11,7 @@ public class HiChatServer {
     
     private final String RABBITMQ_HOST = "localhost";
     private final String MESSAGE_EXCHANGE_NAME = "message_exchange";
-    private final String RPC_EXCHANGE_NAME = "rpc_exchange";
+    private final String RPC_EXCHANGE_NAME = "";
     private final String RPC_QUEUE_NAME = "rpc_queue";
     
     private Thread messageReceiverThread;
@@ -26,6 +26,10 @@ public class HiChatServer {
     private String messageExchange;
     private String notificationExchange;
     
+    public HiChatServer() {
+        this.userManager = new UserManager();
+        this.groupManager = new GroupManager();
+    }
     
     public GroupManager getGroupManager() {
         return this.groupManager;
@@ -61,11 +65,11 @@ public class HiChatServer {
     //Operations                                  
     public void start() throws IOException, TimeoutException {
         // Creating MessageReceiver
-        messageReceiverRunnable = new MessageReceiverRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME);
-        messageReceiverThread = new Thread(messageReceiverRunnable);
-        messageReceiverThread.start();
+//        messageReceiverRunnable = new MessageReceiverRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME);
+//        messageReceiverThread = new Thread(messageReceiverRunnable);
+//        messageReceiverThread.start();
         
-        rpcServerRunnable = new RPCServerRunnable(RABBITMQ_HOST, RPC_EXCHANGE_NAME, RPC_QUEUE_NAME);
+        rpcServerRunnable = new RPCServerRunnable(RABBITMQ_HOST, RPC_EXCHANGE_NAME, RPC_QUEUE_NAME, userManager, groupManager);
         rpcServerThread = new Thread(rpcServerRunnable);
         rpcServerThread.start();
     }
