@@ -38,11 +38,8 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    public List<String> getFriends() {
-        return this.friends;
-    }
-    public void setFriends(ArrayList<String> friends) {
-        this.friends = friends;
+    public void addFriends(String friend) {
+        this.friends.add(friend);
     }
     public ArrayList<Message> getMessages(String username) {
         return this.messages.get(username);
