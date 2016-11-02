@@ -69,10 +69,6 @@ public class MessageReceiverRunnable implements Runnable {
         }
     }
     
-    public void start() {
-        System.out.println("Starting Message Receiver...");
-    }
-    
     public void addNewBinding(String newBindingKey) throws IOException {
         channel.queueBind(queueName, MESSAGE_EXCHANGE_NAME, newBindingKey);
     }
