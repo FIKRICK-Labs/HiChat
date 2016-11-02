@@ -30,11 +30,13 @@ public class MessageSenderRunnable implements Runnable {
     
     private final String destinationRoutingKey;
     private final Message message;
+    private final String messageType;
     
-    public MessageSenderRunnable(String RABBITMQ_HOST, String MESSAGE_EXCHANGE_NAME, Message message, String recipientUsername) throws IOException, TimeoutException {
+    public MessageSenderRunnable(String RABBITMQ_HOST, String MESSAGE_EXCHANGE_NAME, Message message, String recipientName, String messageType) throws IOException, TimeoutException {
         this.RABBITMQ_HOST = RABBITMQ_HOST;
         this.MESSAGE_EXCHANGE_NAME = MESSAGE_EXCHANGE_NAME;
         this.message = message;
+        this.messageType = messageType;
         
         factory = new ConnectionFactory();
         factory.setHost(this.RABBITMQ_HOST);
@@ -43,7 +45,12 @@ public class MessageSenderRunnable implements Runnable {
         
         channel.exchangeDeclare(this.MESSAGE_EXCHANGE_NAME, "topic");
         
-        destinationRoutingKey = "message." + recipientUsername;
+        if (this.messageType.equals("group")) {
+            destinationRoutingKey = "message.group." + recipientName;
+        }
+        else {
+            destinationRoutingKey = "message.private." + recipientName;
+        }
     }
 
     @Override
