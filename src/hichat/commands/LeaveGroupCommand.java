@@ -10,6 +10,12 @@ public class LeaveGroupCommand extends Command {
         type = CommandEnumeration.LEAVEGROUP.value();
     }
     
+    public LeaveGroupCommand(String username, String groupName) {
+        type = CommandEnumeration.LEAVEGROUP.value();
+        this.groupName = groupName;
+        this.username = username;
+    }
+    
     public String getGroupName() {
         return this.groupName;
     }

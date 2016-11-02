@@ -10,6 +10,13 @@ public class AddFriendCommand extends Command {
         type = CommandEnumeration.ADDFRIEND.value();
     }
     
+    public AddFriendCommand(String username, String usernameTarget) {
+        type = CommandEnumeration.ADDFRIEND.value();
+        
+        this.username = username;
+        this.usernameTarget = usernameTarget;
+    }
+    
     private String getUsername() {
         return this.username;
     }

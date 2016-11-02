@@ -31,7 +31,7 @@ public class HiChatClient {
     private final String RPC_EXCHANGE_NAME = "rpc_exchange";
     private final String NOTIFICATION_EXCHANGE_NAME = "notification_exchange";
     
-    private final String RPC_QUEUE_NAME = "rpc_queue";
+    private final String RPC_QUEUE_NAME = "";
     private String oprQueueName;
     private String msgQueueName;
     private String notifQueueName;
@@ -205,36 +205,102 @@ public class HiChatClient {
                 String[] splitStr = listOfActions.remove().split("\\s+");
                 switch (splitStr[0].toUpperCase()) {
                     case "LOGIN":
-                        if (splitStr.length >= 3) {
-
-                        client.login(new LoginCommand(splitStr[1], splitStr[2]));
+                        if (splitStr.length >= 1) {
+                            reader = new Scanner(System.in);
+                            
+                            System.out.println("========== Login Information ==========");
+                            System.out.print(">> Username: ");
+                            String username = reader.nextLine();
+                            System.out.print(">> Password: ");
+                            String password = reader.nextLine();
+                            
+                            client.login(new LoginCommand(username, password));
 
                         } else {
-                            System.out.println("Error: arguments is not completed");
+                            System.out.println("## Error: arguments is not completed");
                         }
                         break;
 
                     case "REGISTER":
+                        if (splitStr.length >= 1) {
+                            reader = new Scanner(System.in);
+                            
+                            System.out.println("========== Register Information ==========");
+                            System.out.print(">> Name: ");
+                            String name = reader.nextLine();
+                            System.out.print(">> Username: ");
+                            String username = reader.nextLine();
+                            System.out.print(">> Password: ");
+                            String password = reader.nextLine();
+
+                        client.register(new RegisterCommand(name, username, password));
+
+                        } else {
+                            System.out.println("## Error: arguments is not completed");
+                        }
                         break;
 
                     case "ADDFRIEND":
+                        if (splitStr.length >= 2) {
+                            reader = new Scanner(System.in);
+                            client.addFriend(new AddFriendCommand(client.getUser().getUsername(), splitStr[1]));
 
+                        } else {
+                            System.out.println("## Error: arguments is not completed");
+                        }
                         break;
 
                     case "CREATEGROUP":
+                        if (splitStr.length >= 1) {
+                            reader = new Scanner(System.in);
+                            System.out.println("========== Group Information ==========");
+                            System.out.print(">> Group Name: ");
+                            String name = reader.nextLine();
+                            System.out.print(">> Members[separate by space]: ");
+                            String[] members = reader.nextLine().split("\\s+");
+                            
+                            client.createGroup(new CreateGroupCommand(client.getUser().getUsername(), name, members));
 
+                        } else {
+                            System.out.println("## Error: arguments is not completed");
+                        }
                         break;
 
                     case "ADDGROUPMEMBER":
+                        if (splitStr.length >= 1) {
+                            reader = new Scanner(System.in);
+                            System.out.println("========== Add Group Members Information ==========");
+                            System.out.print(">> Group Name: ");
+                            String groupName = reader.nextLine();
+                            System.out.print(">> Members[separate by space]: ");
+                            String[] members = reader.nextLine().split("\\s+");
+                            
+                            client.addGroupMember(new AddGroupMemberCommand(client.getUser().getUsername(), groupName, members));
 
+                        } else {
+                            System.out.println("## Error: arguments is not completed");
+                        }
                         break;
 
                     case "LEAVEGROUP":
+                        if (splitStr.length >= 2) {
+                            reader = new Scanner(System.in);
+                            client.leaveGroup(new LeaveGroupCommand(client.getUser().getUsername(), splitStr[1]));
 
+                        } else {
+                            System.out.println("## Error: arguments is not completed");
+                        }
                         break;
 
                     case "HELP":
-
+                        System.out.println(">> ========== Command Information ==========");
+                        System.out.println(">> 1. LOGIN");
+                        System.out.println(">> 2. REGISTER");
+                        System.out.println(">> 3. ADDFRIEND [USERNAME]");
+                        System.out.println(">> 4. CREATEGROUP");
+                        System.out.println(">> 5. ADDGROUPMEMBER");
+                        System.out.println(">> 6. LEAVEGROUP [GROUPNAME]");
+                        
                         break;
 
                     case "EXIT":
@@ -247,9 +313,7 @@ public class HiChatClient {
                 }
 
             } while(true);
-        } catch (IOException ex) {
-            Logger.getLogger(HiChatClient.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
             Logger.getLogger(HiChatClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -7,7 +7,7 @@ public class User {
     private String username;
     private String name;
     private String password;
-    private String friends;
+    private ArrayList<String> friends;
     private Map<String, ArrayList<Message>> messages;
     
     public String getUsername() {
@@ -28,11 +28,8 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-    public String getFriends() {
-        return this.friends;
-    }
-    public void setFriends(String friends) {
-        this.friends = friends;
+    public void setFriends(String friend) {
+        this.friends.add(friend);
     }
     public ArrayList<Message> getMessages(String username) {
         return this.messages.get(username);
