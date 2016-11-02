@@ -18,6 +18,8 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HiChatClient {
     private User user;
@@ -95,6 +97,11 @@ public class HiChatClient {
         oprQueueName = channel.queueDeclare().getQueue();
         consumer = new QueueingConsumer(channel);
         channel.basicConsume(oprQueueName, true, consumer);       
+       
+    }
+    
+    public void close() throws Exception {
+        connection.close();
     }
     
     public void chat(Message message, String receiver) {
@@ -103,56 +110,7 @@ public class HiChatClient {
     public void chatGroup(Message message, String groupName) {
         //TODO
     }
-    public void execute() throws IOException, InterruptedException {
-    mainloop:
-        do {
-            System.out.print(">> ");
-            listOfActions.add(reader.nextLine());
-            
-            String[] splitStr = listOfActions.remove().split("\\s+");
-            switch (splitStr[0].toUpperCase()) {
-                case "LOGIN":
-                    if (splitStr.length >= 3) {
-                        login(new LoginCommand(splitStr[1], splitStr[2]));
-                    } else {
-                        System.out.println("Error: arguments is not completed");
-                    }
-                    break;
-                
-                case "REGISTER":
-                    break;
-                
-                case "ADDFRIEND":
-                    
-                    break;
-                    
-                case "CREATEGROUP":
-                    
-                    break;
-                
-                case "ADDGROUPMEMBER":
-                    
-                    break;
-                    
-                case "LEAVEGROUP":
-                    
-                    break;
-                    
-                case "HELP":
-                    
-                    break;
-                
-                case "EXIT":
-                    
-                    break mainloop;
-                    
-                default:
-                    //Throw error
-            
-            }
-            
-        } while(true);
-    }
+    
     public void login(LoginCommand command) throws IOException, InterruptedException {
         String corrId = UUID.randomUUID().toString();
 
@@ -234,8 +192,65 @@ public class HiChatClient {
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
     }
     
-    public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws IOException, TimeoutException {
         HiChatClient client =  new HiChatClient();
+        
+        try {
+            mainloop:
+            do {
+                System.out.print(">> ");
+                reader = new Scanner(System.in);
+                listOfActions.add(reader.nextLine());
 
+                String[] splitStr = listOfActions.remove().split("\\s+");
+                switch (splitStr[0].toUpperCase()) {
+                    case "LOGIN":
+                        if (splitStr.length >= 3) {
+
+                        client.login(new LoginCommand(splitStr[1], splitStr[2]));
+
+                        } else {
+                            System.out.println("Error: arguments is not completed");
+                        }
+                        break;
+
+                    case "REGISTER":
+                        break;
+
+                    case "ADDFRIEND":
+
+                        break;
+
+                    case "CREATEGROUP":
+
+                        break;
+
+                    case "ADDGROUPMEMBER":
+
+                        break;
+
+                    case "LEAVEGROUP":
+
+                        break;
+
+                    case "HELP":
+
+                        break;
+
+                    case "EXIT":
+
+                        break mainloop;
+
+                    default:
+                        //Throw error
+
+                }
+
+            } while(true);
+        } catch (IOException ex) {
+            Logger.getLogger(HiChatClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(HiChatClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
