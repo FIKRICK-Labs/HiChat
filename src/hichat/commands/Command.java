@@ -5,12 +5,14 @@
  */
 package hichat.commands;
 
+import java.io.Serializable;
+
 
 /**
  *
  * @author mfikria
  */
-public class Command {
+public class Command implements Serializable {
     protected String type;
     public String getType(){
         return this.type;
