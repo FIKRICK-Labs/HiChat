@@ -13,10 +13,16 @@ import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
 import hichat.commands.Command;
+import hichat.commands.RegisterCommand;
+import hichat.controllers.GroupManager;
+import hichat.controllers.UserManager;
 import hichat.helpers.Helper;
 import hichat.models.CommandEnumeration;
+import hichat.models.ResponseCommand;
+import hichat.models.User;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,10 +41,15 @@ public class RPCServerRunnable implements Runnable {
     private final Channel channel;
     private final QueueingConsumer consumer;
     
-    public RPCServerRunnable(String RABBITMQ_HOST, String RPC_EXCHANGE_NAME, String RPC_QUEUE_NAME) throws IOException, TimeoutException {
+    private final UserManager userManager;
+    private final GroupManager groupManager;
+    
+    public RPCServerRunnable(String RABBITMQ_HOST, String RPC_EXCHANGE_NAME, String RPC_QUEUE_NAME, UserManager userManager, GroupManager groupManager) throws IOException, TimeoutException {
         this.RPC_EXCHANGE_NAME = RPC_EXCHANGE_NAME;
         this.RPC_QUEUE_NAME = RPC_QUEUE_NAME;
         this.RABBITMQ_HOST = RABBITMQ_HOST;
+        this.userManager = userManager;
+        this.groupManager = groupManager;
         
         factory = new ConnectionFactory();
         factory.setHost(this.RABBITMQ_HOST);
@@ -59,6 +70,7 @@ public class RPCServerRunnable implements Runnable {
     public void run() {
         while (true) {
             String response = null;
+            ResponseCommand responseCommand = null;
             try {
 
                 QueueingConsumer.Delivery delivery = consumer.nextDelivery();
@@ -70,7 +82,7 @@ public class RPCServerRunnable implements Runnable {
                         .build();
 
                 try {
-    //                String message = new String(delivery.getBody(),"UTF-8");
+//                    String message = new String(delivery.getBody(),"UTF-8");
                     Command command = (Command) Helper.deserialize(delivery.getBody());
     //                int n = Integer.parseInt(message);
                     switch (command.getType()) {
@@ -84,7 +96,17 @@ public class RPCServerRunnable implements Runnable {
                             response = "Login";
                             break;
                         case "REGISTER":
-                            response = "Register";
+                            RegisterCommand registerCommand = (RegisterCommand) command;
+                            String status;
+                            if (userManager.getUsers().containsKey(registerCommand.getUsername())) {
+                                status = "FAILED. Username exists.";
+                            }
+                            else {
+                                User newUser = new User(registerCommand.getUsername(), registerCommand.getName(), registerCommand.getPassword());
+                                userManager.addUser(newUser);
+                                status = "SUCCESS.";
+                            }
+                            responseCommand = new ResponseCommand(status);
                             break;
                         case "CREATEGROUP":
                             response = "Create Group";
@@ -96,10 +118,11 @@ public class RPCServerRunnable implements Runnable {
                             response = "ERROR";
                             break;
                     }
+                    
+                    System.out.println(" [.] Received command: " + command.getType());
 
-    //                System.out.println(" [.] fib(" + message + ")");
+//                    System.out.println(" [.] fib(" + message + ")");
     //                response = "" + fib(n);
-                    response = "TEST";
                 }
                 catch (Exception e){
                     System.out.println(" [.] " + e.toString());
@@ -107,7 +130,7 @@ public class RPCServerRunnable implements Runnable {
                 }
                 finally {
                     try {
-                        channel.basicPublish(this.RPC_EXCHANGE_NAME, props.getReplyTo(), replyProps, response.getBytes("UTF-8"));
+                        channel.basicPublish(this.RPC_EXCHANGE_NAME, props.getReplyTo(), replyProps, Helper.serialize(responseCommand));
 
                         channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
                     } catch (UnsupportedEncodingException ex) {

@@ -29,7 +29,7 @@ public class MessageReceiverRunnable implements Runnable {
     
     public MessageReceiverRunnable(String RABBITMQ_HOST, String MESSAGE_EXCHANGE_NAME) throws IOException, TimeoutException {
         this.MESSAGE_EXCHANGE_NAME = MESSAGE_EXCHANGE_NAME;
-        this.RABBITMQ_HOST = MESSAGE_EXCHANGE_NAME;
+        this.RABBITMQ_HOST = RABBITMQ_HOST;
         
         factory = new ConnectionFactory();
         factory.setHost(this.RABBITMQ_HOST);
