@@ -32,7 +32,7 @@ public class MessageReceiverRunnable implements Runnable {
         this.RABBITMQ_HOST = MESSAGE_EXCHANGE_NAME;
         
         factory = new ConnectionFactory();
-        factory.setHost(RABBITMQ_HOST);
+        factory.setHost(this.RABBITMQ_HOST);
         connection = factory.newConnection();
         channel = connection.createChannel();
         
