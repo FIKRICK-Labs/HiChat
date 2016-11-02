@@ -174,11 +174,7 @@ public class HiChatClient {
             }
         }
         
-        if(response.equals("true")) {
-            System.out.println("Login Success");
-        } else {
-            
-        }
+        System.out.println(response);
     }
     public void register(RegisterCommand command) throws IOException {
         String corrId = UUID.randomUUID().toString();
