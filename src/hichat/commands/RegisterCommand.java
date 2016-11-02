@@ -18,13 +18,6 @@ public class RegisterCommand extends Command {
         this.password = password;
     }
     
-    public RegisterCommand(String username, String name, String password) {
-        type = CommandEnumeration.REGISTER.value();
-        this.username = username;
-        this.name = name;
-        this.password = password;
-    }
-    
     public String getUsername() {
         return this.username;
     }
