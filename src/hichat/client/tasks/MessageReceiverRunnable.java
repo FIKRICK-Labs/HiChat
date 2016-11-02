@@ -40,7 +40,7 @@ public class MessageReceiverRunnable implements Runnable {
         this.MESSAGE_EXCHANGE_NAME = MESSAGE_EXCHANGE_NAME;
         this.RABBITMQ_HOST = MESSAGE_EXCHANGE_NAME;
         
-        this.privateMessageRoutingKey = "#." + username;
+        this.privateMessageRoutingKey = "#.private" + username;
         
         factory = new ConnectionFactory();
         factory.setHost(this.RABBITMQ_HOST);
@@ -84,8 +84,8 @@ public class MessageReceiverRunnable implements Runnable {
         }
     }
     
-    public void addNewBinding(String newBindingKey) throws IOException {
-        channel.queueBind(queueName, MESSAGE_EXCHANGE_NAME, newBindingKey);
+    public void addNewBinding(String newRoutingKey) throws IOException {
+        channel.queueBind(queueName, MESSAGE_EXCHANGE_NAME, newRoutingKey);
     }
     
 }
