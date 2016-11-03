@@ -130,6 +130,7 @@ public class HiChatClient {
         channel.basicConsume(oprQueueName, true, consumer);
         
         notifications = new LinkedList<>();
+        groups = new HashMap<>();
     }
     
     public void close() throws Exception {
@@ -178,9 +179,9 @@ public class HiChatClient {
                         notificationReceiverThread = new Thread(notificationReceiverRunnable);
                         notificationReceiverThread.start();
                         
-                        for (String friend : user.getFriends()) {
-                            messageReceiverRunnable.addNewBindingUsername(friend);
-                        }
+//                        for (String friend : user.getFriends()) {
+//                            messageReceiverRunnable.addNewBindingUsername(friend);
+//                        }
                         for (String group : user.getGroups()) {
                             messageReceiverRunnable.addNewBindingGroupName(group);
                         }
@@ -223,7 +224,7 @@ public class HiChatClient {
                                     .correlationId(corrId)
                                     .replyTo(oprQueueName)
                                     .build();
-        
+        System.out.println(command.getType());
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
         
          while (true) {
@@ -231,16 +232,22 @@ public class HiChatClient {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
-                System.out.println("ADD FRIEND COMMAND RESPONSE: " +responseCommand.getStatus());
+                System.out.println("CREATE GROUP COMMAND RESPONSE: " +responseCommand.getStatus());
                 
                 if(responseCommand.getStatus().contains("SUCCESS")) {
                     this.user.addGroup(command.getGroupName());
-                    
+//                    Group group = new Group();
+//                    group.setAdmin(command.getAdmin());
+//                    group.setGroupName(command.getGroupName());
+//                    group.setMembers(command.getMembers());
+//                    this.groups.put(command.getGroupName(), group);
                     HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
                     if (objectMap.containsKey("group")) {
                         Group group = (Group) objectMap.get("group");
                         this.groups.put(command.getGroupName(), group);
                     }
+                    messageReceiverRunnable.addNewBindingGroupName(command.getGroupName());
+                    
                     
                 } else {
                     System.out.println(responseCommand.getStatus());
@@ -270,6 +277,7 @@ public class HiChatClient {
                 if(responseCommand.getStatus().contains("SUCCESS")) {
                     this.user.removeGroup(command.getGroupName());
                     this.groups.remove(command.getGroupName());
+                    this.messageReceiverRunnable.removeBindingGroupName(command.getGroupName());
                 } else {
                     System.out.println(responseCommand.getStatus());
                 }
@@ -359,7 +367,6 @@ public class HiChatClient {
             this.chatWindowPrivateUsername.trimToSize();
             
             if (this.incomingPrivateMessages.containsKey(recipientName)) {
-                System.out.println("SFSDF");
                 ListIterator<Message> iter = this.incomingPrivateMessages.get(recipientName).listIterator();
                 while (iter.hasNext()) {
                     Message message = iter.next();
@@ -387,6 +394,10 @@ public class HiChatClient {
         do {
             readStr = reader.nextLine();
             if (readStr.equals("/EXITCHAT")) {
+                this.chatWindowPrivateUsername.setLength(0);
+                this.chatWindowPrivateUsername.trimToSize();
+                this.chatWindowGroupUsername.setLength(0);
+                this.chatWindowGroupUsername.trimToSize();
                 break;
             }
             else {
@@ -536,8 +547,9 @@ public class HiChatClient {
                         System.out.print(">> Input group's username: ");
                         reader = new Scanner(System.in);
                         String inputRecipientGroupName = reader.nextLine();
-                        if (client.getUser().getFriends().contains(inputRecipientGroupName)) {
-                            client.chatWindow(inputRecipientGroupName, "private");
+//                        if (client.getUser().getFriends().contains(inputRecipientGroupName)) {
+                        if (client.groups.containsKey(inputRecipientGroupName)) {
+                            client.chatWindow(inputRecipientGroupName, "group");
                         }
                         
                         else {

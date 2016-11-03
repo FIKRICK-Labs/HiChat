@@ -99,13 +99,13 @@ public class MessageReceiverRunnable implements Runnable {
                         else {
                             if (privateMessagesMap.containsKey(message.getSender())) {
                                 privateMessagesMap.get(message.getSender()).add(message);
-//                                System.out.println("Added to list");
+                                System.out.println("Added to list");
                             }
                             else {
                                 ArrayList<Message> messagesList = new ArrayList<>();
                                 messagesList.add(message);
                                 privateMessagesMap.put(message.getSender(), messagesList);
-//                                System.out.println("Created to list");
+                                System.out.println("Created to list");
                             }
                         }
                     }
@@ -152,4 +152,8 @@ public class MessageReceiverRunnable implements Runnable {
         channel.queueBind(queueName, MESSAGE_EXCHANGE_NAME, newUsernameRoutingKey);
     }
     
+    public void removeBindingGroupName(String groupName) throws IOException {
+        String newUsernameRoutingKey = "#.group." + groupName;
+        channel.queueUnbind(queueName, MESSAGE_EXCHANGE_NAME, newUsernameRoutingKey);
+    }
 }

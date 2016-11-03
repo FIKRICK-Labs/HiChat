@@ -1,13 +1,18 @@
 package hichat.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Group {
+public class Group implements Serializable {
     private String groupName;
     private String admin;
     private ArrayList<String> members;
     private ArrayList<Message> messages;
     
+    public Group() {
+        members = new ArrayList<>();
+        messages = new ArrayList<>();
+    }
     
     public String getGroupName() {
         return this.groupName;

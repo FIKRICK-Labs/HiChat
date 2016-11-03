@@ -141,19 +141,25 @@ public class RPCServerRunnable implements Runnable {
                             break;
                         case "CREATEGROUP":
                             CreateGroupCommand createGroupCommand = (CreateGroupCommand) command;
-                            if (this.groupManager.isGroupExist(createGroupCommand.getGroupName())) {                                
+//                            System.out.println("Command: " + command.getType());
+                            if (!this.groupManager.isGroupExist(createGroupCommand.getGroupName())) {
+//                                System.out.println("Command: " + command.getType());
+                                responseCommand = new ResponseCommand();
+                                responseCommand.setStatus("SUCCESS");
+                                
                                 Group group = new Group();
                                 group.setAdmin(createGroupCommand.getAdmin());
                                 group.setGroupName(createGroupCommand.getGroupName());
+//                                System.out.println("Command [1]: " + command.getType());
                                 for(String member: createGroupCommand.getMembers()) {
                                     if(this.userManager.isUserExist(member)) {
                                         group.addMember(member);
                                     }
                                 }
+//                                System.out.println("Command [2]: " + command.getType());
                                 this.groupManager.addGroup(group);
                                 
-                                responseCommand = new ResponseCommand();
-                                responseCommand.setStatus("SUCCESS");
+//                                System.out.println("Command [3]: " + command.getType());
                                 responseCommand.addObjectMap("group", group);
                             } else {
                                 responseCommand = new ResponseCommand("FAILED: Group does exist.");
