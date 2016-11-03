@@ -46,7 +46,7 @@ public class MessageReceiverRunnable implements Runnable {
     
     public MessageReceiverRunnable(String RABBITMQ_HOST, String MESSAGE_EXCHANGE_NAME, String username, StringBuilder currentWindowUsername, StringBuilder currentWindowGroupName, Map<String, ArrayList<Message>> privateMessagesMap, Map<String, ArrayList<Message>> groupMessagesMap) throws IOException, TimeoutException {
         this.MESSAGE_EXCHANGE_NAME = MESSAGE_EXCHANGE_NAME;
-        this.RABBITMQ_HOST = MESSAGE_EXCHANGE_NAME;
+        this.RABBITMQ_HOST = RABBITMQ_HOST;
         
         this.username = username;
         this.currentWindowUsername = currentWindowUsername;
