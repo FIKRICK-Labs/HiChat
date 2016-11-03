@@ -99,11 +99,13 @@ public class MessageReceiverRunnable implements Runnable {
                         else {
                             if (privateMessagesMap.containsKey(message.getSender())) {
                                 privateMessagesMap.get(message.getSender()).add(message);
+//                                System.out.println("Added to list");
                             }
                             else {
                                 ArrayList<Message> messagesList = new ArrayList<>();
                                 messagesList.add(message);
                                 privateMessagesMap.put(message.getSender(), messagesList);
+//                                System.out.println("Created to list");
                             }
                         }
                     }

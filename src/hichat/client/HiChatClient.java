@@ -359,6 +359,7 @@ public class HiChatClient {
             this.chatWindowPrivateUsername.trimToSize();
             
             if (this.incomingPrivateMessages.containsKey(recipientName)) {
+                System.out.println("SFSDF");
                 ListIterator<Message> iter = this.incomingPrivateMessages.get(recipientName).listIterator();
                 while (iter.hasNext()) {
                     Message message = iter.next();
