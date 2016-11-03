@@ -17,16 +17,16 @@ public class AddFriendCommand extends Command {
         this.usernameTarget = usernameTarget;
     }
     
-    private String getUsername() {
+    public String getUsername() {
         return this.username;
     }
-    private void setUsername(String username) {
+    public void setUsername(String username) {
         this.username = username;
     }
-    private String getUsernameTarget() {
+    public String getUsernameTarget() {
         return this.usernameTarget;
     }
-    private void setUsernameTarget(String usernameTarget) {
+    public void setUsernameTarget(String usernameTarget) {
         this.usernameTarget = usernameTarget;
     }    
 }

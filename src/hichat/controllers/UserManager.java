@@ -23,6 +23,13 @@ public class UserManager {
         this.users.put(user.getUsername(), user);
     }
     
+    public void removeGroupFromUser(String username, String groupName) {
+        User user = this.users.get(username);
+        user.removeGroup(groupName);
+        
+        this.users.replace(username, user);
+    }
+    
     // Operations                                  
     public boolean createFriendRelation(String usernameOne, String usernameTwo) {
         this.users.get(usernameOne).getFriends().add(usernameTwo);
@@ -36,6 +43,10 @@ public class UserManager {
             }
         }
         return false;
+    }
+    
+    public boolean isUserExist(String username) {
+        return users.containsKey(username);
     }
     
     

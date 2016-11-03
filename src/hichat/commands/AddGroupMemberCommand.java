@@ -28,5 +28,9 @@ public class AddGroupMemberCommand extends Command {
     }
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public ArrayList<String> getMembers() {
+        return this.members;
     }    
 }

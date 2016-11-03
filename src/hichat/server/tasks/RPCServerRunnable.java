@@ -12,18 +12,15 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.ConsumerCancelledException;
 import com.rabbitmq.client.QueueingConsumer;
 import com.rabbitmq.client.ShutdownSignalException;
-import hichat.commands.Command;
-import hichat.commands.LoginCommand;
-import hichat.commands.RegisterCommand;
+import hichat.commands.*;
 import hichat.controllers.GroupManager;
 import hichat.controllers.UserManager;
 import hichat.helpers.Helper;
-import hichat.models.CommandEnumeration;
+import hichat.models.Group;
 import hichat.models.ResponseCommand;
 import hichat.models.User;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -92,43 +89,85 @@ public class RPCServerRunnable implements Runnable {
                     Map<String, Object> objectMap = new HashMap<>();
                     switch (command.getType()) {
                         case "ADDFRIEND":
-                            response = "Add Friend";
+                            AddFriendCommand addFriendCommand = (AddFriendCommand) command;
+                            String username = addFriendCommand.getUsername();
+                            String usernameTarget = addFriendCommand.getUsernameTarget();
+                            
+                            if (userManager.isUserExist(username) && userManager.isUserExist(usernameTarget)) {
+                               responseCommand = new ResponseCommand("SUCCESS");
+                               userManager.createFriendRelation(username, usernameTarget);
+                                
+                                //Send Notification to target user
+                            } else {
+                                responseCommand = new ResponseCommand("FAILED: User does not exist.");
+                            }
+                            
                             break;
                         case "LEAVEGROUP":
-                            response = "Leave Group";
+                            LeaveGroupCommand leaveGroupCommand = (LeaveGroupCommand) command;
+                            
+                            if(this.userManager.getUser(leaveGroupCommand.getUsername()).doHaveGroup(leaveGroupCommand.getGroupName())) {
+                                this.userManager.removeGroupFromUser(leaveGroupCommand.getUsername(), leaveGroupCommand.getGroupName());
+                                this.groupManager.removeGroup(leaveGroupCommand.getGroupName());
+                                responseCommand = new ResponseCommand("SUCCESS");
+                            } else {
+                                responseCommand = new ResponseCommand("FAILED: User is not member of Group " + leaveGroupCommand.getGroupName() + ".");
+                            }
+                            
                             break;
                         case "LOGIN":
                             LoginCommand loginCommand = (LoginCommand) command;
                             if (userManager.authenticateUser(loginCommand)) {
                                 responseCommand = new ResponseCommand();
-                                responseCommand.setStatus("SUCCESS.");
+                                responseCommand.setStatus("SUCCESS");
                                 responseCommand.addObjectMap("user", userManager.getUser(loginCommand.getUsername()));
                             }
                             else {
-                                responseCommand = new ResponseCommand("FAILED.");
+                                responseCommand = new ResponseCommand("FAILED");
                             }
                             
                             break;
                         case "REGISTER":
                             RegisterCommand registerCommand = (RegisterCommand) command;
                             if (userManager.getUsers().containsKey(registerCommand.getUsername())) {
-                                status = "FAILED. Username exists.";
+                                status = "FAILED: Username exists.";
                             }
                             else {
                                 User newUser = new User(registerCommand.getUsername(), registerCommand.getName(), registerCommand.getPassword());
                                 userManager.addUser(newUser);
-                                status = "SUCCESS.";
+                                status = "SUCCESS";
                             }
                             responseCommand = new ResponseCommand(status);
                             break;
                         case "CREATEGROUP":
-                            response = "Create Group";
+                            CreateGroupCommand createGroupCommand = (CreateGroupCommand) command;
+                            if (this.groupManager.isGroupExist(createGroupCommand.getGroupName())) {
+                                responseCommand = new ResponseCommand("SUCCESS");
+                                
+                                Group group = new Group();
+                                group.setAdmin(createGroupCommand.getAdmin());
+                                group.setGroupName(createGroupCommand.getGroupName());
+                                group.setMembers(createGroupCommand.getMembers());
+                                
+                                this.groupManager.addGroup(group);
+                            }
                             break;
                         case "ADDGROUPMEMBER":
-                            response = "Add Group Member";
+                            AddGroupMemberCommand addGroupMemberCommand = (AddGroupMemberCommand) command;
+                            if(this.groupManager.isGroupExist(addGroupMemberCommand.getGroupName())) {
+                                responseCommand = new ResponseCommand("SUCCESS");
+                                
+                                Group group = this.groupManager.getGroup(addGroupMemberCommand.getGroupName());
+                                
+                                group.addMembers(addGroupMemberCommand.getMembers());
+                                
+                                this.groupManager.replaceGroup(addGroupMemberCommand.getGroupName(), group);
+                            } else {
+                                responseCommand = new ResponseCommand("FAILED: Group does not exist.");                                
+                            }
                             break;
                         default:
-                            response = "ERROR";
+                            responseCommand = new ResponseCommand("FAILED: System does not recognize operation.");
                             break;
                     }
                     

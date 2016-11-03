@@ -17,6 +17,7 @@ import hichat.models.ResponseCommand;
 import hichat.client.tasks.MessageReceiverRunnable;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -188,7 +189,7 @@ public class HiChatClient {
             }
         }
     }
-    public void createGroup(CreateGroupCommand command) throws IOException {
+    public void createGroup(CreateGroupCommand command) throws IOException, InterruptedException, ClassNotFoundException {
         String corrId = UUID.randomUUID().toString();
 
         BasicProperties props = new BasicProperties
@@ -199,8 +200,31 @@ public class HiChatClient {
         
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
         
+         while (true) {
+            ResponseCommand responseCommand;
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
+                System.out.println("ADD FRIEND COMMAND RESPONSE: " +responseCommand.getStatus());
+                
+                if(responseCommand.getStatus().contains("SUCCESS")) {
+                    this.user.addGroup(command.getGroupName());
+                    
+                    Group group = new Group();
+                    group.setAdmin(command.getAdmin());
+                    group.setGroupName(command.getGroupName());
+                    group.setMembers(command.getMembers());
+                    
+                    this.groups.put(command.getGroupName(), group);
+                    
+                } else {
+                    System.out.println(responseCommand.getStatus());
+                }
+                break;
+            }
+        }
     }
-    public void leaveGroup(LeaveGroupCommand command) throws IOException {
+    public void leaveGroup(LeaveGroupCommand command) throws IOException, InterruptedException, ClassNotFoundException {
         String corrId = UUID.randomUUID().toString();
 
         BasicProperties props = new BasicProperties
@@ -210,8 +234,25 @@ public class HiChatClient {
                                     .build();
         
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
+        
+        while (true) {
+            ResponseCommand responseCommand;
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
+                System.out.println("LEAVE GROUP COMMAND RESPONSE: " +responseCommand.getStatus());
+                
+                if(responseCommand.getStatus().contains("SUCCESS")) {
+                    this.user.removeGroup(command.getGroupName());
+                    this.groups.remove(command.getGroupName());
+                } else {
+                    System.out.println(responseCommand.getStatus());
+                }
+                break;
+            }
+        }
     }
-    public void addFriend(AddFriendCommand command) throws IOException {
+    public void addFriend(AddFriendCommand command) throws IOException, InterruptedException, ClassNotFoundException {
         String corrId = UUID.randomUUID().toString();
 
         BasicProperties props = new BasicProperties
@@ -221,8 +262,24 @@ public class HiChatClient {
                                     .build();
         
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
+        
+        while (true) {
+            ResponseCommand responseCommand;
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
+                System.out.println("ADD FRIEND COMMAND RESPONSE: " +responseCommand.getStatus());
+                
+                if(responseCommand.getStatus().contains("SUCCESS")) {
+                    this.user.addFriends(command.getUsernameTarget());
+                } else {
+                    System.out.println(responseCommand.getStatus());
+                }
+                break;
+            }
+        }
     }
-    public void addGroupMember(AddGroupMemberCommand command) throws IOException {
+    public void addGroupMember(AddGroupMemberCommand command) throws IOException, InterruptedException, ClassNotFoundException {
         String corrId = UUID.randomUUID().toString();
 
         BasicProperties props = new BasicProperties
@@ -232,6 +289,25 @@ public class HiChatClient {
                                     .build();
         
         channel.basicPublish(this.RPC_EXCHANGE_NAME, this.RPC_QUEUE_NAME, props, Helper.serialize(command));
+        
+        while (true) {
+            ResponseCommand responseCommand;
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+            if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+                responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
+                System.out.println("ADD FRIEND COMMAND RESPONSE: " +responseCommand.getStatus());
+                
+                if(responseCommand.getStatus().contains("SUCCESS")) {
+                    Group group = this.groups.get(command.getGroupName());
+                    group.addMembers(command.getMembers());
+                    
+                    this.groups.replace(command.getGroupName(), group);
+                } else {
+                    System.out.println(responseCommand.getStatus());
+                }
+                break;
+            }
+        }
     }
     
     public void printFriendList() {
@@ -420,6 +496,7 @@ public class HiChatClient {
 
                     default:
                         //Throw error
+                        System.out.println("## Error: arguments is not completed");
 
                 }
 

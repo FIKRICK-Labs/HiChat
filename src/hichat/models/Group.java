@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Group {
     private String groupName;
     private String admin;
-    private String members;
+    private ArrayList<String> members;
     private ArrayList<Message> messages;
     
     
@@ -25,12 +25,28 @@ public class Group {
         this.admin = admin;
     }
     
-    public String getMembers() {
+    public boolean isMemberExist(String member) {
+        return this.members.contains(member);
+    }
+    
+    public void addMember(String member) {
+        this.members.add(member);
+    }
+    
+    public void addMembers(ArrayList<String> members) {
+        for(String member: members) {
+            if(!this.members.contains(member)) {
+                this.members.add(member);
+            }
+        }
+    }
+    
+    public ArrayList<String> getMembers() {
         return this.members;
     }
     
-    public void setMembers(String members) {
-        this.members = members;
+    public void setMembers(ArrayList<String> arrayMembers) {
+        this.members = arrayMembers;
     }
     
     public ArrayList<Message> getMessages() {
@@ -39,6 +55,10 @@ public class Group {
     
     public void setMessages(Message message) {
         this.messages.add(message);
+    }
+    
+    public void removeMember(String username) {
+        this.members.remove(username);
     }
     
 }

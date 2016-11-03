@@ -11,24 +11,24 @@ public class GroupManager {
         this.groups = new HashMap<>();
     }
     
-    public Group getGroups(String groupName) {
+    public Group getGroup(String groupName) {
         return this.groups.get(groupName);
     }
     
-    public void setGroups(Group group) {
-        this.groups.put(group.getGroupName(), group);
+    public void addGroup(Group group) {
+        this.groups.putIfAbsent(group.getGroupName(), group);
     }
     
-    // Operations                                  
-    public boolean removeMember() {
-        //TODO
-        return false;
+    public boolean isGroupExist(String groupName) {
+        return this.groups.containsKey(groupName);
+    }
+
+    public void replaceGroup(String groupName, Group group) {
+        this.groups.replace(groupName, group);
     }
     
-    public boolean addMember() {
-        //TODO
-        return false;
+    public void removeGroup(String groupName) {
+        this.groups.remove(groupName);
     }
-    
     
 }

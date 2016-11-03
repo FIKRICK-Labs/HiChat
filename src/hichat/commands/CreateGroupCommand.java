@@ -3,12 +3,11 @@ package hichat.commands;
 import hichat.models.CommandEnumeration;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class CreateGroupCommand extends Command {
     private String groupName;
     private String admin;
-    private List<String> members;
+    private ArrayList<String> members;
     
     public CreateGroupCommand() {
         this.members = new ArrayList<>();
@@ -37,5 +36,11 @@ public class CreateGroupCommand extends Command {
     }
     public void setUsername(String member) {
         this.members.add(member);
-    }    
+    }
+    public void addMember(String member) {
+        this.members.add(member);
+    }
+    public ArrayList<String> getMembers() {
+        return this.members;
+    }
 }

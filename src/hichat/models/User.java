@@ -73,4 +73,8 @@ public class User implements Serializable {
     public void initMessages() {
         this.messages = new HashMap<>();
     }
+    
+    public boolean doHaveGroup(String groupName) {
+        return this.groups.contains(groupName);
+    }
 }
