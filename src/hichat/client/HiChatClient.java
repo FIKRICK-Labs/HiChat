@@ -5,6 +5,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.QueueingConsumer;
+import hichat.client.tasks.MessageSenderRunnable;
+import hichat.client.tasks.NotificationReceiverRunnable;
 import hichat.commands.*;
 import hichat.helpers.Helper;
 import hichat.models.Notification;
@@ -12,8 +14,10 @@ import hichat.models.User;
 import hichat.models.Group;
 import hichat.models.Message;
 import hichat.models.ResponseCommand;
+import hichat.client.tasks.MessageReceiverRunnable;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -30,6 +34,7 @@ public class HiChatClient {
     private ArrayList<Notification> notifications;
     private Helper helper;
     
+    private final String RABBITMQ_HOST = "localhost";
     private final String MESSAGE_EXCHANGE_NAME = "message_exchange";
     private final String RPC_EXCHANGE_NAME = "";
     private final String NOTIFICATION_EXCHANGE_NAME = "notification_exchange";
@@ -44,6 +49,16 @@ public class HiChatClient {
     private QueueingConsumer consumer;
 
     private static Queue<String> listOfActions = new LinkedList<>();
+    
+    private Thread messageReceiverThread;
+    private MessageReceiverRunnable messageReceiverRunnable;
+    private NotificationReceiverRunnable notificationReceiverRunnable;
+    
+    private volatile StringBuilder chatWindowPrivateUsername = new StringBuilder();
+    private volatile StringBuilder chatWindowGroupUsername = new StringBuilder();
+    private volatile Map<String, ArrayList<Message>> incomingPrivateMessages = new HashMap<>();
+    private volatile Map<String, ArrayList<Message>> incomingGroupMessages = new HashMap<>();
+    private volatile Map<String, ArrayList<Notification>> incomingNotifications = new HashMap();
 
     public User getUser() {
         return this.user;
@@ -98,22 +113,23 @@ public class HiChatClient {
 
         oprQueueName = channel.queueDeclare().getQueue();
         consumer = new QueueingConsumer(channel);
-        channel.basicConsume(oprQueueName, true, consumer);       
-       
+        channel.basicConsume(oprQueueName, true, consumer);
     }
     
     public void close() throws Exception {
         connection.close();
     }
     
-    public void chat(Message message, String receiver) {
-        //TODO
+    public void chat(Message message, String receiver) throws IOException, TimeoutException {
+        MessageSenderRunnable messageSenderRunnable = new MessageSenderRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME, message, receiver, "private");
+        messageSenderRunnable.run();
     }
-    public void chatGroup(Message message, String groupName) {
-        //TODO
+    public void chatGroup(Message message, String groupName) throws IOException, TimeoutException {
+        MessageSenderRunnable messageSenderRunnable = new MessageSenderRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME, message, groupName, "group");
+        messageSenderRunnable.run();
     }
     
-    public void login(LoginCommand command) throws IOException, InterruptedException, ClassNotFoundException {
+    public void login(LoginCommand command) throws IOException, InterruptedException, ClassNotFoundException, TimeoutException {
         String corrId = UUID.randomUUID().toString();
 
         BasicProperties props = new BasicProperties
@@ -130,10 +146,19 @@ public class HiChatClient {
             QueueingConsumer.Delivery delivery = consumer.nextDelivery();
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
-                System.out.println("REGISTER COMMAND RESPONSE: " +responseCommand.getStatus());
+                System.out.println("LOGIN COMMAND RESPONSE: " +responseCommand.getStatus());
                 HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
                 if (objectMap.containsKey("user")) {
                     this.user = (User) objectMap.get("user");
+                    messageReceiverRunnable = new MessageReceiverRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME, user.getUsername(), chatWindowPrivateUsername, chatWindowGroupUsername, incomingPrivateMessages, incomingGroupMessages);
+                    messageReceiverThread = new Thread(messageReceiverRunnable);
+                    messageReceiverThread.start();
+                    for (String friend : user.getFriends()) {
+                        messageReceiverRunnable.addNewBindingUsername(friend);
+                    }
+                    for (String group : user.getGroups()) {
+                        messageReceiverRunnable.addNewBindingGroupName(group);
+                    }
                 }
                 printFriendList();
                 printGroupList();
@@ -223,6 +248,39 @@ public class HiChatClient {
         for(String group : user.getGroups()) {
             System.out.println(group);
         }
+    }
+    
+    public void chatWindow(String recipientName, String messageType) throws IOException, TimeoutException {
+        System.out.println("===== CHAT WITH " + recipientName + " =====");
+        if (messageType.equals("private")) {
+            this.chatWindowPrivateUsername.setLength(recipientName.length());
+            this.chatWindowPrivateUsername.replace(0, recipientName.length() - 1, recipientName);
+        }
+        else if (messageType.equals("group")) {
+            this.chatWindowGroupUsername.setLength(recipientName.length());
+            this.chatWindowGroupUsername.replace(0, recipientName.length() - 1, recipientName);
+        }
+        Scanner reader = new Scanner(System.in);
+        String readStr;
+        do {
+            readStr = reader.nextLine();
+            if (readStr.equals("/EXITCHAT")) {
+                break;
+            }
+            else {
+                Message message = new Message();
+                message.setSender(this.user.getUsername());
+                message.setContent(readStr);
+                message.setSentDate(new Date());
+                if (messageType.equals("private")) {
+                    this.chat(message, recipientName);
+                }
+                else if (messageType.equals("group")) {
+                    this.chatGroup(message, recipientName);
+                }
+            }
+        }
+        while (true);
     }
     
     public static void main(String[] args) throws IOException, TimeoutException, ClassNotFoundException {
@@ -324,6 +382,26 @@ public class HiChatClient {
                             System.out.println("## Error: arguments is not completed");
                         }
                         break;
+                        
+                    case "CHATPRIVATE":
+                        if (splitStr.length >= 2) {
+                            reader = new Scanner(System.in);
+                            String recipientName = reader.nextLine();
+                            client.chatWindow(recipientName, "private");
+                        }
+                        else {
+                            System.out.println("## Error: arguments is not completed");
+                        }
+                        
+                    case "CHATGROUP":
+                        if (splitStr.length >= 2) {
+                            reader = new Scanner(System.in);
+                            String recipientName = reader.nextLine();
+                            client.chatWindow(recipientName, "group");
+                        }
+                        else {
+                            System.out.println("## Error: arguments is not completed");
+                        }
 
                     case "HELP":
                         System.out.println(">> ========== Command Information ==========");

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  *
  * @author Erick Chandra
  */
-public class MessageSenderRunnable implements Runnable {
+public class MessageSenderRunnable {
     private final String MESSAGE_EXCHANGE_NAME;
     private final String RABBITMQ_HOST;
     
@@ -53,7 +53,6 @@ public class MessageSenderRunnable implements Runnable {
         }
     }
 
-    @Override
     public void run() {
         try {
             channel.basicPublish(MESSAGE_EXCHANGE_NAME, destinationRoutingKey, null, Helper.serialize(this.message));
