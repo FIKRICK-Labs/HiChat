@@ -148,7 +148,7 @@ public class HiChatClient {
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
                 System.out.println("LOGIN COMMAND RESPONSE: " +responseCommand.getStatus());
-                if (responseCommand.getStatus().equals("SUCCESS.")) {
+                if (responseCommand.getStatus().equals("SUCCESS")) {
                     HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
                     if (objectMap.containsKey("user")) {
                         this.user = (User) objectMap.get("user");
@@ -213,12 +213,11 @@ public class HiChatClient {
                 if(responseCommand.getStatus().contains("SUCCESS")) {
                     this.user.addGroup(command.getGroupName());
                     
-                    Group group = new Group();
-                    group.setAdmin(command.getAdmin());
-                    group.setGroupName(command.getGroupName());
-                    group.setMembers(command.getMembers());
-                    
-                    this.groups.put(command.getGroupName(), group);
+                    HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
+                    if (objectMap.containsKey("group")) {
+                        Group group = (Group) objectMap.get("group");
+                        this.groups.put(command.getGroupName(), group);
+                    }
                     
                 } else {
                     System.out.println(responseCommand.getStatus());
@@ -427,10 +426,17 @@ public class HiChatClient {
                             System.out.print(">> Group Name: ");
                             String name = reader.nextLine();
                             System.out.print(">> Members[separate by space]: ");
-                            String[] members = reader.nextLine().split("\\s+");
-                            
+                            ArrayList<String> members = new ArrayList<>();
+                            members.add(client.getUser().getUsername());
+                            String input = reader.nextLine();
+                            if(input != null && !input.equals("")) {
+                                String[] membersArray = input.split("\\s+");
+                                
+                                members.addAll(Arrays.asList(membersArray));
+                            }
+                           
                             client.createGroup(new CreateGroupCommand(client.getUser().getUsername(), name, members));
-
+                            
                         } else {
                             System.out.println("## Error: arguments is not completed");
                         }
@@ -443,7 +449,13 @@ public class HiChatClient {
                             System.out.print(">> Group Name: ");
                             String groupName = reader.nextLine();
                             System.out.print(">> Members[separate by space]: ");
-                            String[] members = reader.nextLine().split("\\s+");
+                            ArrayList<String> members = new ArrayList<>();
+                            String input = reader.nextLine();
+                            if(input != null && !input.equals("")) {
+                                String[] membersArray = input.split("\\s+");
+                                
+                                members.addAll(Arrays.asList(membersArray));
+                            }
                             
                             client.addGroupMember(new AddGroupMemberCommand(client.getUser().getUsername(), groupName, members));
 
