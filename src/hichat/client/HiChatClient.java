@@ -147,21 +147,24 @@ public class HiChatClient {
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
                 System.out.println("LOGIN COMMAND RESPONSE: " +responseCommand.getStatus());
-                HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
-                if (objectMap.containsKey("user")) {
-                    this.user = (User) objectMap.get("user");
-                    messageReceiverRunnable = new MessageReceiverRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME, user.getUsername(), chatWindowPrivateUsername, chatWindowGroupUsername, incomingPrivateMessages, incomingGroupMessages);
-                    messageReceiverThread = new Thread(messageReceiverRunnable);
-                    messageReceiverThread.start();
-                    for (String friend : user.getFriends()) {
-                        messageReceiverRunnable.addNewBindingUsername(friend);
+                if (responseCommand.getStatus().equals("SUCCESS.")) {
+                    HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
+                    if (objectMap.containsKey("user")) {
+                        this.user = (User) objectMap.get("user");
+                        messageReceiverRunnable = new MessageReceiverRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME, user.getUsername(), chatWindowPrivateUsername, chatWindowGroupUsername, incomingPrivateMessages, incomingGroupMessages);
+                        messageReceiverThread = new Thread(messageReceiverRunnable);
+                        messageReceiverThread.start();
+                        for (String friend : user.getFriends()) {
+                            messageReceiverRunnable.addNewBindingUsername(friend);
+                        }
+                        for (String group : user.getGroups()) {
+                            messageReceiverRunnable.addNewBindingGroupName(group);
+                        }
                     }
-                    for (String group : user.getGroups()) {
-                        messageReceiverRunnable.addNewBindingGroupName(group);
-                    }
+                    printFriendList();
+                    printGroupList();
                 }
-                printFriendList();
-                printGroupList();
+                
                 break;
             }
         }
