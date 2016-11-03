@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
@@ -148,8 +149,9 @@ public class HiChatClient {
             if (delivery.getProperties().getCorrelationId().equals(corrId)) {
                 responseCommand = (ResponseCommand) Helper.deserialize(delivery.getBody());
                 System.out.println("LOGIN COMMAND RESPONSE: " +responseCommand.getStatus());
-                if (responseCommand.getStatus().equals("SUCCESS.")) {
+                if (responseCommand.getStatus().equals("SUCCESS")) {
                     HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
+                    
                     if (objectMap.containsKey("user")) {
                         this.user = (User) objectMap.get("user");
                         messageReceiverRunnable = new MessageReceiverRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME, user.getUsername(), chatWindowPrivateUsername, chatWindowGroupUsername, incomingPrivateMessages, incomingGroupMessages);
@@ -332,13 +334,33 @@ public class HiChatClient {
     public void chatWindow(String recipientName, String messageType) throws IOException, TimeoutException {
         System.out.println("===== CHAT WITH " + recipientName + " =====");
         if (messageType.equals("private")) {
-            this.chatWindowPrivateUsername.setLength(recipientName.length());
+            this.chatWindowPrivateUsername.setLength(recipientName.length() - 1);
             this.chatWindowPrivateUsername.replace(0, recipientName.length() - 1, recipientName);
+            this.chatWindowPrivateUsername.trimToSize();
+            
+            if (this.incomingPrivateMessages.containsKey(recipientName)) {
+                ListIterator<Message> iter = this.incomingPrivateMessages.get(recipientName).listIterator();
+                while (iter.hasNext()) {
+                    Message message = iter.next();
+                    System.out.println(message.getSender() + " [" + message.getSentDate().toString() + "]: " + message.getContent());
+                    iter.remove();
+                }
+            }
         }
         else if (messageType.equals("group")) {
             this.chatWindowGroupUsername.setLength(recipientName.length());
             this.chatWindowGroupUsername.replace(0, recipientName.length() - 1, recipientName);
+            
+            if (this.incomingGroupMessages.containsKey(recipientName)) {
+                ListIterator<Message> iter = this.incomingGroupMessages.get(recipientName).listIterator();
+                while (iter.hasNext()) {
+                    Message message = iter.next();
+                    System.out.println(message.getSender() + " [" + message.getSentDate().toString() + "]: " + message.getContent());
+                    iter.remove();
+                }
+            }
         }
+        
         Scanner reader = new Scanner(System.in);
         String readStr;
         do {
@@ -463,24 +485,31 @@ public class HiChatClient {
                         break;
                         
                     case "CHATPRIVATE":
-                        if (splitStr.length >= 2) {
-                            reader = new Scanner(System.in);
-                            String recipientName = reader.nextLine();
-                            client.chatWindow(recipientName, "private");
-                        }
-                        else {
-                            System.out.println("## Error: arguments is not completed");
+                        System.out.print(">> Input friend's username: ");
+                        reader = new Scanner(System.in);
+                        String inputRecipientName = reader.nextLine();
+                        
+                        if (client.getUser().getFriends().contains(inputRecipientName)) {
+                            client.chatWindow(inputRecipientName, "private");
                         }
                         
-                    case "CHATGROUP":
-                        if (splitStr.length >= 2) {
-                            reader = new Scanner(System.in);
-                            String recipientName = reader.nextLine();
-                            client.chatWindow(recipientName, "group");
-                        }
                         else {
-                            System.out.println("## Error: arguments is not completed");
+                            System.out.println("## Failed: friend not found.");
                         }
+                        break;
+                        
+                    case "CHATGROUP":
+                        System.out.print(">> Input group's username: ");
+                        reader = new Scanner(System.in);
+                        String inputRecipientGroupName = reader.nextLine();
+                        if (client.getUser().getFriends().contains(inputRecipientGroupName)) {
+                            client.chatWindow(inputRecipientGroupName, "private");
+                        }
+                        
+                        else {
+                            System.out.println("## Failed: group not found.");
+                        }
+                        break;
 
                     case "HELP":
                         System.out.println(">> ========== Command Information ==========");

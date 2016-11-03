@@ -84,10 +84,16 @@ public class MessageReceiverRunnable implements Runnable {
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 try {
                     Message message = (Message) Helper.deserialize(body);
-                    String[] routingKeySplit = envelope.getRoutingKey().split(".");
+                    String receivedRoutingKey = new String(envelope.getRoutingKey());
+                    String[] routingKeySplit = receivedRoutingKey.split("\\.");
                     String receivedMessageType = routingKeySplit[routingKeySplit.length - 2];
+//                    System.out.println("Received message type: " + receivedMessageType);
                     if (receivedMessageType.equals("private")) {
-                        if (currentWindowUsername.equals(message.getSender())) {
+//                        System.out.println("currentWindowUsername" + currentWindowUsername);
+//                        System.out.println("message sender" + message.getSender());
+//                        System.out.println(" [x] Received from topic '" + envelope.getRoutingKey() + "' :: [SENDER:" + message.getSender() + "], [CONTENT:" + message.getContent() + "], [DATE:" + message.getSentDate().toString() + "].");
+//                        System.out.println(message.getSender() + ":" + message.getSender().length() + " vs " + currentWindowUsername + ":" + currentWindowUsername.length());
+                        if (currentWindowUsername.toString().equals(message.getSender())) {
                             System.out.println(" [x] Received from topic '" + envelope.getRoutingKey() + "' :: [SENDER:" + message.getSender() + "], [CONTENT:" + message.getContent() + "], [DATE:" + message.getSentDate().toString() + "].");
                         }
                         else {
