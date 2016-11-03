@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 public class HiChatClient {
     private User user;
     private Map<String, Group> groups;
-    private ArrayList<Notification> notifications;
+    private LinkedList<Notification> notifications;
     private Helper helper;
     
     private final String RABBITMQ_HOST = "localhost";
@@ -52,6 +52,7 @@ public class HiChatClient {
     private static Queue<String> listOfActions = new LinkedList<>();
     
     private Thread messageReceiverThread;
+    private Thread notificationReceiverThread;
     private MessageReceiverRunnable messageReceiverRunnable;
     private NotificationReceiverRunnable notificationReceiverRunnable;
     
@@ -59,13 +60,24 @@ public class HiChatClient {
     private volatile StringBuilder chatWindowGroupUsername = new StringBuilder();
     private volatile Map<String, ArrayList<Message>> incomingPrivateMessages = new HashMap<>();
     private volatile Map<String, ArrayList<Message>> incomingGroupMessages = new HashMap<>();
-    private volatile Map<String, ArrayList<Notification>> incomingNotifications = new HashMap();
 
     public User getUser() {
         return this.user;
     }
+    public void addNewFriend(String friend) {
+        this.user.addFriends(friend);
+    }
     public void setUser(User user) {
         this.user = user;
+    }
+    public void addNotification(Notification notification) {
+        this.notifications.add(notification);
+    }
+    public void displayNotification() {
+        System.out.println("## Notification: ");
+        for(Notification notification: this.notifications) {
+            System.out.println("## " + notification.getContent());
+        }
     }
     public Group getGroup(String groupName) {
         return this.groups.get(groupName);
@@ -111,14 +123,18 @@ public class HiChatClient {
         factory.setHost("localhost");
         connection = factory.newConnection();
         channel = connection.createChannel();
-
+        
         oprQueueName = channel.queueDeclare().getQueue();
         consumer = new QueueingConsumer(channel);
         channel.basicConsume(oprQueueName, true, consumer);
+        
+        notifications = new LinkedList<>();
     }
     
     public void close() throws Exception {
         connection.close();
+        notificationReceiverThread.interrupt();
+        messageReceiverThread.interrupt();
     }
     
     public void chat(Message message, String receiver) throws IOException, TimeoutException {
@@ -155,6 +171,11 @@ public class HiChatClient {
                         messageReceiverRunnable = new MessageReceiverRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME, user.getUsername(), chatWindowPrivateUsername, chatWindowGroupUsername, incomingPrivateMessages, incomingGroupMessages);
                         messageReceiverThread = new Thread(messageReceiverRunnable);
                         messageReceiverThread.start();
+                        
+                        notificationReceiverRunnable = new NotificationReceiverRunnable(RABBITMQ_HOST, NOTIFICATION_EXCHANGE_NAME, user.getUsername(), this);
+                        notificationReceiverThread = new Thread(notificationReceiverRunnable);
+                        notificationReceiverThread.start();
+                        
                         for (String friend : user.getFriends()) {
                             messageReceiverRunnable.addNewBindingUsername(friend);
                         }
@@ -503,6 +524,10 @@ public class HiChatClient {
                         System.out.println(">> 5. ADDGROUPMEMBER");
                         System.out.println(">> 6. LEAVEGROUP [GROUPNAME]");
                         
+                        break;
+                        
+                    case "NOTIFICATION":
+                        client.displayNotification();
                         break;
 
                     case "EXIT":
