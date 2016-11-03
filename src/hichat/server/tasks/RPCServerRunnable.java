@@ -141,16 +141,24 @@ public class RPCServerRunnable implements Runnable {
                             break;
                         case "CREATEGROUP":
                             CreateGroupCommand createGroupCommand = (CreateGroupCommand) command;
-                            if (this.groupManager.isGroupExist(createGroupCommand.getGroupName())) {
-                                responseCommand = new ResponseCommand("SUCCESS");
-                                
+                            if (this.groupManager.isGroupExist(createGroupCommand.getGroupName())) {                                
                                 Group group = new Group();
                                 group.setAdmin(createGroupCommand.getAdmin());
                                 group.setGroupName(createGroupCommand.getGroupName());
-                                group.setMembers(createGroupCommand.getMembers());
-                                
+                                for(String member: createGroupCommand.getMembers()) {
+                                    if(this.userManager.isUserExist(member)) {
+                                        group.addMember(member);
+                                    }
+                                }
                                 this.groupManager.addGroup(group);
+                                
+                                responseCommand = new ResponseCommand();
+                                responseCommand.setStatus("SUCCESS");
+                                responseCommand.addObjectMap("group", group);
+                            } else {
+                                responseCommand = new ResponseCommand("FAILED: Group does exist.");
                             }
+                                
                             break;
                         case "ADDGROUPMEMBER":
                             AddGroupMemberCommand addGroupMemberCommand = (AddGroupMemberCommand) command;

@@ -1,6 +1,8 @@
 package hichat.models;
 
-public class Notification {
+import java.io.Serializable;
+
+public class Notification implements Serializable {
     private NotificationEnumeration type;
     private String content;
     private Object object;

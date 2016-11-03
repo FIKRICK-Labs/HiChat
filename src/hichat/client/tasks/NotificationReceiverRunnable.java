@@ -68,7 +68,9 @@ public class NotificationReceiverRunnable implements Runnable {
                     
                     // Processing Notification
                     if (notification.getType().equals(NotificationEnumeration.SOMEONE_ADDED_YOU)) {
-                        
+                        String friend = (String) notification.getObject();
+                        hiChatClient.addNewFriend(friend);
+                        hiChatClient.addNotification(notification);
                     }
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(hichat.server.tasks.MessageReceiverRunnable.class.getName()).log(Level.SEVERE, null, ex);

@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 public class HiChatClient {
     private User user;
     private Map<String, Group> groups;
-    private ArrayList<Notification> notifications;
+    private LinkedList<Notification> notifications;
     private Helper helper;
     
     private final String RABBITMQ_HOST = "localhost";
@@ -53,6 +53,7 @@ public class HiChatClient {
     private static Queue<String> listOfActions = new LinkedList<>();
     
     private Thread messageReceiverThread;
+    private Thread notificationReceiverThread;
     private MessageReceiverRunnable messageReceiverRunnable;
     private NotificationReceiverRunnable notificationReceiverRunnable;
     
@@ -60,13 +61,24 @@ public class HiChatClient {
     private volatile StringBuilder chatWindowGroupUsername = new StringBuilder();
     private volatile Map<String, ArrayList<Message>> incomingPrivateMessages = new HashMap<>();
     private volatile Map<String, ArrayList<Message>> incomingGroupMessages = new HashMap<>();
-    private volatile Map<String, ArrayList<Notification>> incomingNotifications = new HashMap();
 
     public User getUser() {
         return this.user;
     }
+    public void addNewFriend(String friend) {
+        this.user.addFriends(friend);
+    }
     public void setUser(User user) {
         this.user = user;
+    }
+    public void addNotification(Notification notification) {
+        this.notifications.add(notification);
+    }
+    public void displayNotification() {
+        System.out.println("## Notification: ");
+        for(Notification notification: this.notifications) {
+            System.out.println("## " + notification.getContent());
+        }
     }
     public Group getGroup(String groupName) {
         return this.groups.get(groupName);
@@ -112,14 +124,18 @@ public class HiChatClient {
         factory.setHost("localhost");
         connection = factory.newConnection();
         channel = connection.createChannel();
-
+        
         oprQueueName = channel.queueDeclare().getQueue();
         consumer = new QueueingConsumer(channel);
         channel.basicConsume(oprQueueName, true, consumer);
+        
+        notifications = new LinkedList<>();
     }
     
     public void close() throws Exception {
         connection.close();
+        notificationReceiverThread.interrupt();
+        messageReceiverThread.interrupt();
     }
     
     public void chat(Message message, String receiver) throws IOException, TimeoutException {
@@ -157,6 +173,11 @@ public class HiChatClient {
                         messageReceiverRunnable = new MessageReceiverRunnable(RABBITMQ_HOST, MESSAGE_EXCHANGE_NAME, user.getUsername(), chatWindowPrivateUsername, chatWindowGroupUsername, incomingPrivateMessages, incomingGroupMessages);
                         messageReceiverThread = new Thread(messageReceiverRunnable);
                         messageReceiverThread.start();
+                        
+                        notificationReceiverRunnable = new NotificationReceiverRunnable(RABBITMQ_HOST, NOTIFICATION_EXCHANGE_NAME, user.getUsername(), this);
+                        notificationReceiverThread = new Thread(notificationReceiverRunnable);
+                        notificationReceiverThread.start();
+                        
                         for (String friend : user.getFriends()) {
                             messageReceiverRunnable.addNewBindingUsername(friend);
                         }
@@ -215,12 +236,11 @@ public class HiChatClient {
                 if(responseCommand.getStatus().contains("SUCCESS")) {
                     this.user.addGroup(command.getGroupName());
                     
-                    Group group = new Group();
-                    group.setAdmin(command.getAdmin());
-                    group.setGroupName(command.getGroupName());
-                    group.setMembers(command.getMembers());
-                    
-                    this.groups.put(command.getGroupName(), group);
+                    HashMap<String, Object> objectMap = (HashMap<String, Object>) responseCommand.getObjectMap();
+                    if (objectMap.containsKey("group")) {
+                        Group group = (Group) objectMap.get("group");
+                        this.groups.put(command.getGroupName(), group);
+                    }
                     
                 } else {
                     System.out.println(responseCommand.getStatus());
@@ -449,10 +469,17 @@ public class HiChatClient {
                             System.out.print(">> Group Name: ");
                             String name = reader.nextLine();
                             System.out.print(">> Members[separate by space]: ");
-                            String[] members = reader.nextLine().split("\\s+");
-                            
+                            ArrayList<String> members = new ArrayList<>();
+                            members.add(client.getUser().getUsername());
+                            String input = reader.nextLine();
+                            if(input != null && !input.equals("")) {
+                                String[] membersArray = input.split("\\s+");
+                                
+                                members.addAll(Arrays.asList(membersArray));
+                            }
+                           
                             client.createGroup(new CreateGroupCommand(client.getUser().getUsername(), name, members));
-
+                            
                         } else {
                             System.out.println("## Error: arguments is not completed");
                         }
@@ -465,7 +492,13 @@ public class HiChatClient {
                             System.out.print(">> Group Name: ");
                             String groupName = reader.nextLine();
                             System.out.print(">> Members[separate by space]: ");
-                            String[] members = reader.nextLine().split("\\s+");
+                            ArrayList<String> members = new ArrayList<>();
+                            String input = reader.nextLine();
+                            if(input != null && !input.equals("")) {
+                                String[] membersArray = input.split("\\s+");
+                                
+                                members.addAll(Arrays.asList(membersArray));
+                            }
                             
                             client.addGroupMember(new AddGroupMemberCommand(client.getUser().getUsername(), groupName, members));
 
@@ -520,6 +553,10 @@ public class HiChatClient {
                         System.out.println(">> 5. ADDGROUPMEMBER");
                         System.out.println(">> 6. LEAVEGROUP [GROUPNAME]");
                         
+                        break;
+                        
+                    case "NOTIFICATION":
+                        client.displayNotification();
                         break;
 
                     case "EXIT":

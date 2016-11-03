@@ -13,12 +13,12 @@ public class AddGroupMemberCommand extends Command {
         this.members = new ArrayList<>();
         type = CommandEnumeration.ADDGROUPMEMBER.value();
     }
-    public AddGroupMemberCommand(String admin, String groupName, String[] members) {
+    public AddGroupMemberCommand(String admin, String groupName, ArrayList<String> members) {
         type = CommandEnumeration.ADDGROUPMEMBER.value();
         
         this.admin = admin;
         this.groupName = groupName;
-        this.members = new ArrayList<>(Arrays.asList(members));
+        this.members = members;
     }
     public void setUsername(String username) {
         this.members.add(username);

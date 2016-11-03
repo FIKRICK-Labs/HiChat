@@ -14,12 +14,12 @@ public class CreateGroupCommand extends Command {
         type = CommandEnumeration.CREATEGROUP.value();
     }     
     
-    public CreateGroupCommand(String admin, String groupName, String[] members) {
+    public CreateGroupCommand(String admin, String groupName, ArrayList<String> members) {
         type = CommandEnumeration.CREATEGROUP.value();
         
         this.admin = admin;
         this.groupName = groupName;
-        this.members = new ArrayList<>(Arrays.asList(members));
+        this.members = members;
     }    
     
     public String getGroupName() {
